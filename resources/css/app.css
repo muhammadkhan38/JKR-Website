@@ -1,0 +1,64 @@
+@import 'tailwindcss';
+
+@source '../views/**/*.blade.php';
+@source '../js/**/*.js';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@layer components {
+    .nav-link {
+        @apply text-sm font-semibold text-emerald-950 hover:text-emerald-700;
+    }
+
+    .section-kicker {
+        @apply text-sm font-semibold uppercase tracking-wide text-emerald-700;
+    }
+
+    .section-heading {
+        @apply mt-1 text-3xl font-bold tracking-tight text-emerald-950;
+    }
+
+    .form-label {
+        @apply mb-2 block text-sm font-semibold text-slate-700;
+    }
+
+    .form-input {
+        @apply w-full rounded-md border border-slate-300 bg-white px-3 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100;
+    }
+
+    .admin-table {
+        @apply w-full min-w-[760px] text-left text-sm;
+    }
+
+    .admin-table th {
+        @apply border-b border-slate-200 bg-slate-50 px-4 py-3 font-semibold text-slate-600;
+    }
+
+    .admin-table td {
+        @apply border-b border-slate-100 px-4 py-3 align-top text-slate-700;
+    }
+
+    .admin-action {
+        @apply rounded-md bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-700 hover:bg-emerald-100;
+    }
+
+    .admin-danger {
+        @apply rounded-md bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-700 hover:bg-red-100;
+    }
+
+    .status-badge {
+        @apply inline-flex rounded px-2 py-1 text-xs font-semibold;
+    }
+}
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}

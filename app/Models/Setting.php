@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Setting extends Model
+{
+    protected $fillable = ['key', 'value'];
+
+    public static function valueFor(string $key, ?string $default = null): ?string
+    {
+        return static::query()->where('key', $key)->value('value') ?? $default;
+    }
+
+    public static function pairs(): array
+    {
+        return static::query()->pluck('value', 'key')->all();
+    }
+}
