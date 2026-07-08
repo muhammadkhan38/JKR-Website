@@ -44,17 +44,17 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return back()->with('success', 'User role updated.');
+        return back()->with('success', 'صارف کا کردار اپ ڈیٹ کر دیا گیا۔');
     }
 
     public function destroy(Request $request, User $user): RedirectResponse
     {
         if ($request->user()->is($user)) {
-            return back()->with('error', 'You cannot delete your own account.');
+            return back()->with('error', 'آپ اپنا اکاؤنٹ حذف نہیں کر سکتے۔');
         }
 
         $user->delete();
 
-        return back()->with('success', 'User deleted.');
+        return back()->with('success', 'صارف حذف کر دیا گیا۔');
     }
 }

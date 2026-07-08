@@ -33,7 +33,7 @@ class CategoryController extends Controller
 
         Category::create($data);
 
-        return back()->with('success', 'Category created.');
+        return back()->with('success', 'زمرہ شامل کر دیا گیا۔');
     }
 
     public function show(Category $category): RedirectResponse
@@ -60,13 +60,13 @@ class CategoryController extends Controller
         $data['is_active'] = $request->boolean('is_active');
         $category->update($data);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category updated.');
+        return redirect()->route('admin.categories.index')->with('success', 'زمرہ اپ ڈیٹ کر دیا گیا۔');
     }
 
     public function destroy(Category $category): RedirectResponse
     {
         $category->delete();
 
-        return back()->with('success', 'Category deleted.');
+        return back()->with('success', 'زمرہ حذف کر دیا گیا۔');
     }
 }

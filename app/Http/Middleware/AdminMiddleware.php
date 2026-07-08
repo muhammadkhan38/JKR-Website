@@ -11,7 +11,7 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (! $request->user()?->isAdmin()) {
-            return redirect()->route('home')->with('error', 'Admin access is required.');
+            return redirect()->route('home')->with('error', 'انتظامی حصے تک رسائی کے لیے منتظم ہونا ضروری ہے۔');
         }
 
         return $next($request);

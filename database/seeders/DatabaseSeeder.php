@@ -10,7 +10,6 @@ use App\Models\IslamicEvent;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,92 +17,97 @@ class DatabaseSeeder extends Seeder
     {
         User::updateOrCreate(
             ['email' => 'admin@madrasa.test'],
-            ['name' => 'Admin', 'password' => 'password123', 'role' => 'admin']
+            ['name' => 'منتظم', 'password' => 'password123', 'role' => 'admin']
         );
 
         User::updateOrCreate(
             ['email' => 'student@madrasa.test'],
-            ['name' => 'Student User', 'password' => 'password123', 'role' => 'user']
+            ['name' => 'طالب علم', 'password' => 'password123', 'role' => 'user']
         );
 
         $categories = collect([
-            ['name' => 'Quran Studies', 'description' => 'Books related to Quran recitation, tafsir, and understanding.'],
-            ['name' => 'Hadith', 'description' => 'Selected Hadith collections and explanations.'],
-            ['name' => 'Fiqh', 'description' => 'Practical Islamic rulings for daily life.'],
-            ['name' => 'Seerah', 'description' => 'Biography and character of Prophet Muhammad, peace be upon him.'],
-            ['name' => 'Duas', 'description' => 'Supplications and daily remembrances.'],
-        ])->mapWithKeys(fn ($data) => [
+            'quran-studies' => ['name' => 'علومِ قرآن', 'description' => 'قرآن کریم کی تلاوت، تفسیر اور فہم سے متعلق کتب۔'],
+            'hadith' => ['name' => 'حدیث', 'description' => 'منتخب احادیث اور ان کی آسان تشریحات۔'],
+            'fiqh' => ['name' => 'فقہ', 'description' => 'روزمرہ زندگی کے عملی شرعی احکام۔'],
+            'seerah' => ['name' => 'سیرت', 'description' => 'رسول اللہ ﷺ کی مبارک سیرت اور اخلاق سے متعلق کتب۔'],
+            'duas' => ['name' => 'دعائیں', 'description' => 'مسنون دعائیں اور روزانہ کے اذکار۔'],
+        ])->mapWithKeys(fn ($data, $slug) => [
             $data['name'] => Category::updateOrCreate(
-                ['slug' => Str::slug($data['name'])],
+                ['slug' => $slug],
                 $data + ['is_active' => true]
             ),
         ]);
 
         $authors = collect([
-            ['name' => 'Madrasa Scholars', 'bio' => 'Prepared and reviewed by the Madrasa teaching staff.'],
-            ['name' => 'Mufti Abdul Hakeem', 'bio' => 'Teacher of Fiqh and Hadith.'],
-            ['name' => 'Maulana Rashid Ahmad', 'bio' => 'Speaker and Islamic studies instructor.'],
-        ])->mapWithKeys(fn ($data) => [
+            'madrasa-scholars' => ['name' => 'علمائے مدرسہ', 'bio' => 'مدرسہ کے اساتذہ کی نگرانی میں تیار اور نظرِ ثانی شدہ مواد۔'],
+            'mufti-abdul-hakeem' => ['name' => 'مفتی عبدالحکیم', 'bio' => 'فقہ اور حدیث کے استاد۔'],
+            'maulana-rashid-ahmad' => ['name' => 'مولانا راشد احمد', 'bio' => 'مقرر اور اسلامیات کے مدرس۔'],
+        ])->mapWithKeys(fn ($data, $slug) => [
             $data['name'] => Author::updateOrCreate(
-                ['slug' => Str::slug($data['name'])],
+                ['slug' => $slug],
                 $data
             ),
         ]);
 
         $bookRows = [
             [
-                'title' => 'Ramadan Guide for Students',
-                'author' => 'Madrasa Scholars',
-                'category' => 'Fiqh',
-                'language' => 'Urdu',
-                'short_description' => 'A concise guide to fasting, taraweeh, zakat, and Ramadan manners.',
+                'slug' => 'ramadan-guide-for-students',
+                'title' => 'طلبہ کے لیے رمضان گائیڈ',
+                'author' => 'علمائے مدرسہ',
+                'category' => 'فقہ',
+                'language' => 'اردو',
+                'short_description' => 'روزہ، تراویح، زکات اور رمضان کے آداب پر مختصر رہنما کتاب۔',
                 'is_latest' => true,
                 'is_featured' => true,
             ],
             [
-                'title' => 'Selected Daily Duas',
-                'author' => 'Madrasa Scholars',
-                'category' => 'Duas',
-                'language' => 'Arabic / Urdu',
-                'short_description' => 'Daily duas with simple meanings for students and families.',
+                'slug' => 'selected-daily-duas',
+                'title' => 'منتخب روزانہ دعائیں',
+                'author' => 'علمائے مدرسہ',
+                'category' => 'دعائیں',
+                'language' => 'عربی / اردو',
+                'short_description' => 'طلبہ اور گھر والوں کے لیے روزانہ کی دعائیں آسان معانی کے ساتھ۔',
                 'is_latest' => true,
             ],
             [
-                'title' => 'Introduction to Seerah',
-                'author' => 'Maulana Rashid Ahmad',
-                'category' => 'Seerah',
-                'language' => 'English',
-                'short_description' => 'An introductory reading plan for learning the blessed life of the Prophet.',
+                'slug' => 'introduction-to-seerah',
+                'title' => 'سیرت کا تعارف',
+                'author' => 'مولانا راشد احمد',
+                'category' => 'سیرت',
+                'language' => 'اردو',
+                'short_description' => 'رسول اللہ ﷺ کی مبارک زندگی کو سمجھنے کے لیے ابتدائی مطالعہ۔',
                 'is_featured' => true,
             ],
             [
-                'title' => 'Hajj and Umrah Basics',
-                'author' => 'Mufti Abdul Hakeem',
-                'category' => 'Fiqh',
-                'language' => 'Urdu',
-                'short_description' => 'Simple rulings and reminders for Hajj and Umrah journeys.',
+                'slug' => 'hajj-and-umrah-basics',
+                'title' => 'حج و عمرہ کے بنیادی مسائل',
+                'author' => 'مفتی عبدالحکیم',
+                'category' => 'فقہ',
+                'language' => 'اردو',
+                'short_description' => 'حج اور عمرہ کے سفر کے لیے آسان احکام اور ضروری یاد دہانیاں۔',
                 'is_featured' => true,
             ],
             [
-                'title' => 'Hadith for Character Building',
-                'author' => 'Maulana Rashid Ahmad',
-                'category' => 'Hadith',
-                'language' => 'English',
-                'short_description' => 'Short Hadith selections focused on manners, honesty, and service.',
+                'slug' => 'hadith-for-character-building',
+                'title' => 'اخلاق سازی کے لیے احادیث',
+                'author' => 'مولانا راشد احمد',
+                'category' => 'حدیث',
+                'language' => 'اردو',
+                'short_description' => 'آداب، دیانت اور خدمت کے موضوع پر مختصر منتخب احادیث۔',
                 'is_latest' => true,
             ],
         ];
 
         $books = collect($bookRows)->mapWithKeys(function (array $row) use ($categories, $authors) {
             $book = Book::updateOrCreate(
-                ['slug' => Str::slug($row['title'])],
+                ['slug' => $row['slug']],
                 [
                     'title' => $row['title'],
                     'author_id' => $authors[$row['author']]->id,
                     'category_id' => $categories[$row['category']]->id,
                     'language' => $row['language'],
                     'short_description' => $row['short_description'],
-                    'description' => $row['short_description']."\n\nUpload the full PDF from the admin panel to make this book readable online.",
+                    'description' => $row['short_description']."\n\nاس کتاب کو آن لائن پڑھنے کے قابل بنانے کے لیے انتظامی پینل سے مکمل PDF اپ لوڈ کریں۔",
                     'is_latest' => $row['is_latest'] ?? false,
                     'is_featured' => $row['is_featured'] ?? false,
                     'is_active' => true,
@@ -111,43 +115,43 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            return [$row['title'] => $book];
+            return [$row['slug'] => $book];
         });
 
         $ramadan = IslamicEvent::updateOrCreate(
             ['slug' => 'ramadan-collection'],
             [
-                'title' => 'Ramadan Collection',
-                'description' => 'Books for fasting, zakat, taraweeh, and Ramadan preparation.',
+                'title' => 'رمضان مجموعہ',
+                'description' => 'روزہ، زکات، تراویح اور رمضان کی تیاری سے متعلق کتب۔',
                 'start_date' => now()->subDays(15)->toDateString(),
                 'end_date' => now()->addDays(45)->toDateString(),
                 'is_active' => true,
                 'display_order' => 1,
             ]
         );
-        $ramadan->books()->sync([$books['Ramadan Guide for Students']->id, $books['Selected Daily Duas']->id]);
+        $ramadan->books()->sync([$books['ramadan-guide-for-students']->id, $books['selected-daily-duas']->id]);
 
         $seerah = IslamicEvent::updateOrCreate(
             ['slug' => 'seerah-collection'],
             [
-                'title' => 'Seerah Collection',
-                'description' => 'Readings about the life, mercy, and character of the Prophet, peace be upon him.',
+                'title' => 'سیرت مجموعہ',
+                'description' => 'رسول اللہ ﷺ کی حیاتِ مبارکہ، رحمت اور اخلاق کے بارے میں منتخب مطالعہ۔',
                 'start_date' => null,
                 'end_date' => null,
                 'is_active' => true,
                 'display_order' => 2,
             ]
         );
-        $seerah->books()->sync([$books['Introduction to Seerah']->id, $books['Hadith for Character Building']->id]);
+        $seerah->books()->sync([$books['introduction-to-seerah']->id, $books['hadith-for-character-building']->id]);
 
         Audio::updateOrCreate(
             ['slug' => 'ramadan-preparation-lecture'],
             [
-                'title' => 'Preparing for Ramadan',
-                'speaker' => 'Mufti Abdul Hakeem',
-                'description' => 'A short lecture note. Upload MP3 from admin to enable playback.',
-                'book_id' => $books['Ramadan Guide for Students']->id,
-                'category_id' => $categories['Fiqh']->id,
+                'title' => 'رمضان کی تیاری',
+                'speaker' => 'مفتی عبدالحکیم',
+                'description' => 'مختصر بیان کی تفصیل۔ آڈیو چلانے کے لیے انتظامی پینل سے MP3 اپ لوڈ کریں۔',
+                'book_id' => $books['ramadan-guide-for-students']->id,
+                'category_id' => $categories['فقہ']->id,
                 'islamic_event_id' => $ramadan->id,
                 'duration' => '18:00',
                 'is_active' => true,
@@ -155,13 +159,13 @@ class DatabaseSeeder extends Seeder
         );
 
         foreach ([
-            'madrasa_name' => 'Madrasa Islamic Books',
+            'madrasa_name' => 'مدرسہ اسلامی کتب',
             'contact_number' => '+92 300 0000000',
             'whatsapp_number' => '+92 300 0000000',
             'email' => 'info@madrasa.test',
-            'address' => 'Madrasa Office, Main Road',
-            'short_about' => 'A simple Madrasa library for selected books, event collections, bookmarks, and audio lessons.',
-            'footer_text' => 'Serving beneficial knowledge with simplicity and respect.',
+            'address' => 'مدرسہ دفتر، مین روڈ',
+            'short_about' => 'منتخب اسلامی کتب، موقع کی مناسبت سے مجموعوں، محفوظ فہرست اور آڈیو اسباق کے لیے ایک سادہ مدرسہ لائبریری۔',
+            'footer_text' => 'سادگی اور احترام کے ساتھ نفع بخش علم کی خدمت۔',
             'facebook_link' => null,
             'youtube_link' => null,
             'logo' => null,

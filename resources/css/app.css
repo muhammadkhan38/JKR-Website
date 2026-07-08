@@ -6,8 +6,24 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', 'Noto Naskh Arabic', Arial, sans-serif;
+}
+
+.urdu-text {
+    direction: rtl;
+    text-align: right;
+    font-family: "Jameel Noori Nastaleeq", "Noto Nastaliq Urdu", "Noto Naskh Arabic", Arial, sans-serif;
+    font-size: 20px;
+    line-height: 2.1;
+}
+
+.urdu-heading {
+    direction: rtl;
+    text-align: right;
+    font-family: "Jameel Noori Nastaleeq", "Noto Nastaliq Urdu", "Noto Naskh Arabic", Arial, sans-serif;
+    font-size: 32px;
+    line-height: 1.8;
+    font-weight: bold;
 }
 
 @layer components {
@@ -20,7 +36,9 @@
     }
 
     .section-heading {
-        @apply mt-1 text-3xl font-bold tracking-tight text-emerald-950;
+        @apply mt-1 font-bold tracking-tight text-emerald-950;
+        font-size: 32px;
+        line-height: 1.8;
     }
 
     .form-label {
@@ -32,7 +50,7 @@
     }
 
     .admin-table {
-        @apply w-full min-w-[760px] text-left text-sm;
+        @apply w-full min-w-[760px] text-right text-sm;
     }
 
     .admin-table th {

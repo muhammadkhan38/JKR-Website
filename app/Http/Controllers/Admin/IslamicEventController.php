@@ -36,7 +36,7 @@ class IslamicEventController extends Controller
         $event = IslamicEvent::create($data);
         $event->books()->sync($request->input('book_ids', []));
 
-        return back()->with('success', 'Islamic event created.');
+        return back()->with('success', 'اسلامی مجموعہ شامل کر دیا گیا۔');
     }
 
     public function show(IslamicEvent $islamicEvent): RedirectResponse
@@ -69,7 +69,7 @@ class IslamicEventController extends Controller
         $islamicEvent->update($data);
         $islamicEvent->books()->sync($request->input('book_ids', []));
 
-        return redirect()->route('admin.islamic-events.index')->with('success', 'Islamic event updated.');
+        return redirect()->route('admin.islamic-events.index')->with('success', 'اسلامی مجموعہ اپ ڈیٹ کر دیا گیا۔');
     }
 
     public function destroy(IslamicEvent $islamicEvent): RedirectResponse
@@ -80,7 +80,7 @@ class IslamicEventController extends Controller
 
         $islamicEvent->delete();
 
-        return back()->with('success', 'Islamic event deleted.');
+        return back()->with('success', 'اسلامی مجموعہ حذف کر دیا گیا۔');
     }
 
     private function validated(Request $request, bool $bannerNullable = true): array

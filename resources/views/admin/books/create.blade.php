@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Add Book')
-@section('heading', 'Add Book')
+@section('title', 'کتاب شامل کریں')
+@section('heading', 'کتاب شامل کریں')
 
 @section('content')
 <form method="POST" action="{{ route('admin.books.store') }}" enctype="multipart/form-data" class="rounded-md border border-slate-200 bg-white p-6 shadow-sm">

@@ -34,6 +34,6 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return back()->with('success', 'Profile updated.');
+        return back()->with('success', 'پروفائل اپ ڈیٹ ہو گئی۔');
     }
 }

@@ -40,7 +40,7 @@ class BookController extends Controller
 
         Book::create($data);
 
-        return redirect()->route('admin.books.index')->with('success', 'Book created.');
+        return redirect()->route('admin.books.index')->with('success', 'کتاب شامل کر دی گئی۔');
     }
 
     public function show(Book $book): RedirectResponse
@@ -75,7 +75,7 @@ class BookController extends Controller
         $this->setBooleans($data, $request);
         $book->update($data);
 
-        return redirect()->route('admin.books.index')->with('success', 'Book updated.');
+        return redirect()->route('admin.books.index')->with('success', 'کتاب اپ ڈیٹ کر دی گئی۔');
     }
 
     public function destroy(Book $book): RedirectResponse
@@ -84,7 +84,7 @@ class BookController extends Controller
         $this->deletePublicFile($book->pdf_file);
         $book->delete();
 
-        return back()->with('success', 'Book deleted.');
+        return back()->with('success', 'کتاب حذف کر دی گئی۔');
     }
 
     private function validated(Request $request, bool $requirePdf = true): array

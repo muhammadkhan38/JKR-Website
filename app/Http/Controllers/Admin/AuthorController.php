@@ -31,7 +31,7 @@ class AuthorController extends Controller
         $data['slug'] = Slug::unique(Author::class, $data['name']);
         Author::create($data);
 
-        return back()->with('success', 'Author created.');
+        return back()->with('success', 'مصنف شامل کر دیا گیا۔');
     }
 
     public function show(Author $author): RedirectResponse
@@ -57,13 +57,13 @@ class AuthorController extends Controller
         $data['slug'] = Slug::unique(Author::class, $data['name'], $author->id);
         $author->update($data);
 
-        return redirect()->route('admin.authors.index')->with('success', 'Author updated.');
+        return redirect()->route('admin.authors.index')->with('success', 'مصنف اپ ڈیٹ کر دیا گیا۔');
     }
 
     public function destroy(Author $author): RedirectResponse
     {
         $author->delete();
 
-        return back()->with('success', 'Author deleted.');
+        return back()->with('success', 'مصنف حذف کر دیا گیا۔');
     }
 }

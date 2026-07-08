@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
-@section('title', 'Manage Users')
-@section('heading', 'Manage Users')
+@section('title', 'صارفین کا انتظام')
+@section('heading', 'صارفین کا انتظام')
 
 @section('content')
 <div class="rounded-md border border-slate-200 bg-white shadow-sm">
     <table class="admin-table">
-        <thead><tr><th>Name</th><th>Email</th><th>Bookmarks</th><th>Role</th><th>Actions</th></tr></thead>
+        <thead><tr><th>نام</th><th>ای میل</th><th>محفوظ کتب</th><th>کردار</th><th>عمل</th></tr></thead>
         <tbody>
             @foreach($users as $user)
                 <tr>
@@ -17,16 +17,16 @@
                         <form method="POST" action="{{ route('admin.users.update', $user) }}" class="flex gap-2">
                             @csrf @method('PUT')
                             <select name="role" class="rounded-md border border-slate-300 px-2 py-1 text-sm">
-                                <option value="user" @selected($user->role === 'user')>User</option>
-                                <option value="admin" @selected($user->role === 'admin')>Admin</option>
+                                <option value="user" @selected($user->role === 'user')>عام صارف</option>
+                                <option value="admin" @selected($user->role === 'admin')>منتظم</option>
                             </select>
-                            <button class="admin-action">Save</button>
+                            <button class="admin-action">محفوظ کریں</button>
                         </form>
                     </td>
                     <td>
                         <form method="POST" action="{{ route('admin.users.destroy', $user) }}" data-confirm-delete>
                             @csrf @method('DELETE')
-                            <button class="admin-danger">Delete</button>
+                            <button class="admin-danger">حذف</button>
                         </form>
                     </td>
                 </tr>

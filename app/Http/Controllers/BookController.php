@@ -72,7 +72,7 @@ class BookController extends Controller
         abort_unless($book->is_active && $book->download_allowed, 403);
 
         if (! $book->pdf_file || ! Storage::disk('public')->exists($book->pdf_file)) {
-            return back()->with('error', 'The PDF file is not available yet.');
+            return back()->with('error', 'PDF فائل ابھی دستیاب نہیں۔');
         }
 
         return Storage::disk('public')->download($book->pdf_file, $book->slug.'.pdf');

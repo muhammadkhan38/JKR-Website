@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Manage Authors')
-@section('heading', 'Manage Authors')
+@section('title', 'مصنفین کا انتظام')
+@section('heading', 'مصنفین کا انتظام')
 
 @section('content')
 @php($authorForm = $editing ?? new \App\Models\Author())
@@ -9,26 +9,26 @@
     <form method="POST" action="{{ $authorForm->exists ? route('admin.authors.update', $authorForm) : route('admin.authors.store') }}" class="rounded-md border border-slate-200 bg-white p-5 shadow-sm">
         @csrf
         @if($authorForm->exists) @method('PUT') @endif
-        <h2 class="mb-4 text-lg font-bold">{{ $authorForm->exists ? 'Edit Author' : 'Add Author' }}</h2>
-        <label class="form-label" for="name">Name</label>
+        <h2 class="mb-4 text-lg font-bold">{{ $authorForm->exists ? 'مصنف میں ترمیم' : 'مصنف شامل کریں' }}</h2>
+        <label class="form-label" for="name">نام</label>
         <input class="form-input" id="name" name="name" value="{{ old('name', $authorForm->name) }}" required>
-        <label class="form-label mt-4" for="bio">Bio</label>
+        <label class="form-label mt-4" for="bio">مختصر تعارف</label>
         <textarea class="form-input" id="bio" name="bio" rows="6">{{ old('bio', $authorForm->bio) }}</textarea>
-        <button class="mt-5 rounded-md bg-emerald-700 px-4 py-2 font-semibold text-white">{{ $authorForm->exists ? 'Update' : 'Create' }}</button>
+        <button class="mt-5 rounded-md bg-emerald-700 px-4 py-2 font-semibold text-white">{{ $authorForm->exists ? 'اپ ڈیٹ کریں' : 'شامل کریں' }}</button>
     </form>
     <div class="rounded-md border border-slate-200 bg-white shadow-sm">
         <table class="admin-table">
-            <thead><tr><th>Name</th><th>Books</th><th>Actions</th></tr></thead>
+            <thead><tr><th>نام</th><th>کتب</th><th>عمل</th></tr></thead>
             <tbody>
                 @foreach($authors as $author)
                     <tr>
                         <td>{{ $author->name }}</td>
                         <td>{{ $author->books_count }}</td>
                         <td class="flex gap-2">
-                            <a class="admin-action" href="{{ route('admin.authors.edit', $author) }}">Edit</a>
+                            <a class="admin-action" href="{{ route('admin.authors.edit', $author) }}">ترمیم</a>
                             <form method="POST" action="{{ route('admin.authors.destroy', $author) }}" data-confirm-delete>
                                 @csrf @method('DELETE')
-                                <button class="admin-danger">Delete</button>
+                                <button class="admin-danger">حذف</button>
                             </form>
                         </td>
                     </tr>

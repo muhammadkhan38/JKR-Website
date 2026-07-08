@@ -62,6 +62,6 @@ class SettingController extends Controller
             Setting::updateOrCreate(['key' => $key], ['value' => $data[$key] ?? null]);
         }
 
-        return back()->with('success', 'Settings updated.');
+        return back()->with('success', 'ترتیبات محفوظ کر دی گئیں۔');
     }
 }

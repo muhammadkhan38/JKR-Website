@@ -39,7 +39,7 @@ class AudioController extends Controller
 
         Audio::create($data);
 
-        return back()->with('success', 'Audio created.');
+        return back()->with('success', 'آڈیو شامل کر دی گئی۔');
     }
 
     public function show(Audio $audio): RedirectResponse
@@ -73,7 +73,7 @@ class AudioController extends Controller
 
         $audio->update($data);
 
-        return redirect()->route('admin.audios.index')->with('success', 'Audio updated.');
+        return redirect()->route('admin.audios.index')->with('success', 'آڈیو اپ ڈیٹ کر دی گئی۔');
     }
 
     public function destroy(Audio $audio): RedirectResponse
@@ -84,7 +84,7 @@ class AudioController extends Controller
 
         $audio->delete();
 
-        return back()->with('success', 'Audio deleted.');
+        return back()->with('success', 'آڈیو حذف کر دی گئی۔');
     }
 
     private function validated(Request $request, bool $requireFile = true): array
