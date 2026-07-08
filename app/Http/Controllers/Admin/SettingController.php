@@ -12,17 +12,20 @@ use Illuminate\View\View;
 class SettingController extends Controller
 {
     public const KEYS = [
-        'madrasa_name',
         'logo',
         'homepage_banner',
         'contact_number',
         'whatsapp_number',
         'email',
+        'facebook_link',
+        'youtube_link',
+    ];
+
+    public const LOCALIZED_KEYS = [
+        'madrasa_name',
         'address',
         'short_about',
         'footer_text',
-        'facebook_link',
-        'youtube_link',
     ];
 
     public function index(): View
@@ -33,13 +36,17 @@ class SettingController extends Controller
     public function update(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'madrasa_name' => ['nullable', 'string', 'max:255'],
+            'madrasa_name_en' => ['nullable', 'string', 'max:255'],
+            'madrasa_name_ur' => ['nullable', 'string', 'max:255'],
             'contact_number' => ['nullable', 'string', 'max:80'],
             'whatsapp_number' => ['nullable', 'string', 'max:80'],
             'email' => ['nullable', 'email', 'max:255'],
-            'address' => ['nullable', 'string'],
-            'short_about' => ['nullable', 'string'],
-            'footer_text' => ['nullable', 'string'],
+            'address_en' => ['nullable', 'string'],
+            'address_ur' => ['nullable', 'string'],
+            'short_about_en' => ['nullable', 'string'],
+            'short_about_ur' => ['nullable', 'string'],
+            'footer_text_en' => ['nullable', 'string'],
+            'footer_text_ur' => ['nullable', 'string'],
             'facebook_link' => ['nullable', 'url', 'max:255'],
             'youtube_link' => ['nullable', 'url', 'max:255'],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
@@ -62,6 +69,12 @@ class SettingController extends Controller
             Setting::updateOrCreate(['key' => $key], ['value' => $data[$key] ?? null]);
         }
 
-        return back()->with('success', 'ترتیبات محفوظ کر دی گئیں۔');
+        foreach (self::LOCALIZED_KEYS as $key) {
+            foreach (array_keys(config('app.supported_locales', ['en' => 'English'])) as $locale) {
+                Setting::updateOrCreate(['key' => $key.'_'.$locale], ['value' => $data[$key.'_'.$locale] ?? null]);
+            }
+        }
+
+        return back()->with('success', __('messages.flash.settings_saved'));
     }
 }

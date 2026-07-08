@@ -9,6 +9,6 @@ class ContactController extends Controller
 {
     public function index(): View
     {
-        return view('contact', ['settings' => Setting::pairs()]);
+        return view('contact', ['settings' => Setting::localizedPairs()]);
     }
 }

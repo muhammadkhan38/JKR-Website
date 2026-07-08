@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Author;
 use App\Models\Book;
 use App\Models\Category;
+use App\Support\LocalizedColumns;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -20,12 +21,25 @@ class BookController extends Controller
             ->when($request->filled('q'), function ($query) use ($request): void {
                 $term = '%'.$request->string('q')->toString().'%';
                 $query->where(function ($search) use ($term): void {
-                    $search->where('title', 'like', $term)
-                        ->orWhere('language', 'like', $term)
-                        ->orWhere('short_description', 'like', $term)
-                        ->orWhere('description', 'like', $term)
-                        ->orWhereHas('author', fn ($author) => $author->where('name', 'like', $term))
-                        ->orWhereHas('category', fn ($category) => $category->where('name', 'like', $term));
+                    foreach (['title', 'language', 'short_description', 'description'] as $field) {
+                        foreach (LocalizedColumns::searchColumns($field) as $column) {
+                            $search->orWhere($column, 'like', $term);
+                        }
+                    }
+
+                    $search->orWhereHas('author', function ($author) use ($term): void {
+                        $author->where(function ($authorSearch) use ($term): void {
+                            foreach (LocalizedColumns::searchColumns('name') as $column) {
+                                $authorSearch->orWhere($column, 'like', $term);
+                            }
+                        });
+                    })->orWhereHas('category', function ($category) use ($term): void {
+                        $category->where(function ($categorySearch) use ($term): void {
+                            foreach (LocalizedColumns::searchColumns('name') as $column) {
+                                $categorySearch->orWhere($column, 'like', $term);
+                            }
+                        });
+                    });
                 });
             })
             ->when($request->filled('category'), fn ($query) => $query->where('category_id', $request->integer('category')))
@@ -39,9 +53,9 @@ class BookController extends Controller
 
         return view('books.index', [
             'books' => $books,
-            'categories' => Category::active()->orderBy('name')->get(),
-            'authors' => Author::orderBy('name')->get(),
-            'languages' => Book::active()->select('language')->distinct()->orderBy('language')->pluck('language'),
+            'categories' => Category::active()->orderByRaw(LocalizedColumns::orderExpression('name'))->get(),
+            'authors' => Author::orderByRaw(LocalizedColumns::orderExpression('name'))->get(),
+            'languages' => Book::active()->select('language', 'language_en', 'language_ur')->distinct()->orderByRaw(LocalizedColumns::orderExpression('language'))->get(),
         ]);
     }
 
@@ -71,10 +85,12 @@ class BookController extends Controller
     {
         abort_unless($book->is_active && $book->download_allowed, 403);
 
-        if (! $book->pdf_file || ! Storage::disk('public')->exists($book->pdf_file)) {
-            return back()->with('error', 'PDF فائل ابھی دستیاب نہیں۔');
+        $pdfPath = $book->localizedPdfPath();
+
+        if (! $pdfPath || ! Storage::disk('public')->exists($pdfPath)) {
+            return back()->with('error', __('messages.books.download_unavailable'));
         }
 
-        return Storage::disk('public')->download($book->pdf_file, $book->slug.'.pdf');
+        return Storage::disk('public')->download($pdfPath, $book->slug.'.pdf');
     }
 }

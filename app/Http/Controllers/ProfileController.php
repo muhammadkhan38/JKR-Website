@@ -34,6 +34,6 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return back()->with('success', 'پروفائل اپ ڈیٹ ہو گئی۔');
+        return back()->with('success', __('messages.flash.profile_updated'));
     }
 }

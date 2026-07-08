@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Audio;
+use App\Support\LocalizedColumns;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -14,9 +15,13 @@ class AudioController extends Controller
             ->with(['book', 'category', 'islamicEvent'])
             ->when($request->filled('q'), function ($query) use ($request): void {
                 $term = '%'.$request->string('q')->toString().'%';
-                $query->where('title', 'like', $term)
-                    ->orWhere('speaker', 'like', $term)
-                    ->orWhere('description', 'like', $term);
+                $query->where(function ($search) use ($term): void {
+                    foreach (['title', 'speaker', 'description'] as $field) {
+                        foreach (LocalizedColumns::searchColumns($field) as $column) {
+                            $search->orWhere($column, 'like', $term);
+                        }
+                    }
+                });
             })
             ->latest()
             ->paginate(12)

@@ -27,10 +27,10 @@ class BookmarkController extends Controller
         $request->user()->bookmarks()->firstOrCreate(['book_id' => $book->id]);
 
         if ($request->expectsJson()) {
-            return response()->json(['bookmarked' => true, 'message' => 'کتاب آپ کی محفوظ فہرست میں شامل کر دی گئی۔']);
+            return response()->json(['bookmarked' => true, 'message' => __('messages.flash.book_saved')]);
         }
 
-        return back()->with('success', 'کتاب آپ کی محفوظ فہرست میں شامل کر دی گئی۔');
+        return back()->with('success', __('messages.flash.book_saved'));
     }
 
     public function destroy(Request $request, Book $book): JsonResponse|RedirectResponse
@@ -38,9 +38,9 @@ class BookmarkController extends Controller
         $request->user()->bookmarks()->where('book_id', $book->id)->delete();
 
         if ($request->expectsJson()) {
-            return response()->json(['bookmarked' => false, 'message' => 'کتاب محفوظ فہرست سے نکال دی گئی۔']);
+            return response()->json(['bookmarked' => false, 'message' => __('messages.flash.book_removed')]);
         }
 
-        return back()->with('success', 'کتاب محفوظ فہرست سے نکال دی گئی۔');
+        return back()->with('success', __('messages.flash.book_removed'));
     }
 }

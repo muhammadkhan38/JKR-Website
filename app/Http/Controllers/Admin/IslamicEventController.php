@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Models\IslamicEvent;
+use App\Support\LocalizedColumns;
 use App\Support\Slug;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class IslamicEventController extends Controller
     {
         return view('admin.events.index', [
             'events' => IslamicEvent::withCount('books')->orderBy('display_order')->paginate(15),
-            'books' => Book::active()->orderBy('title')->get(),
+            'books' => Book::active()->orderByRaw(LocalizedColumns::orderExpression('title'))->get(),
         ]);
     }
 
@@ -29,6 +30,7 @@ class IslamicEventController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validated($request);
+        $this->setLegacyFields($data);
         $data['slug'] = Slug::unique(IslamicEvent::class, $data['title']);
         $data['is_active'] = $request->boolean('is_active');
         $data['banner_image'] = $request->file('banner_image')?->store('events', 'public');
@@ -36,7 +38,7 @@ class IslamicEventController extends Controller
         $event = IslamicEvent::create($data);
         $event->books()->sync($request->input('book_ids', []));
 
-        return back()->with('success', 'اسلامی مجموعہ شامل کر دیا گیا۔');
+        return back()->with('success', __('messages.flash.event_created'));
     }
 
     public function show(IslamicEvent $islamicEvent): RedirectResponse
@@ -48,7 +50,7 @@ class IslamicEventController extends Controller
     {
         return view('admin.events.index', [
             'events' => IslamicEvent::withCount('books')->orderBy('display_order')->paginate(15),
-            'books' => Book::active()->orderBy('title')->get(),
+            'books' => Book::active()->orderByRaw(LocalizedColumns::orderExpression('title'))->get(),
             'editing' => $islamicEvent->load('books'),
         ]);
     }
@@ -56,6 +58,7 @@ class IslamicEventController extends Controller
     public function update(Request $request, IslamicEvent $islamicEvent): RedirectResponse
     {
         $data = $this->validated($request, false);
+        $this->setLegacyFields($data);
         $data['slug'] = Slug::unique(IslamicEvent::class, $data['title'], $islamicEvent->id);
         $data['is_active'] = $request->boolean('is_active');
 
@@ -69,7 +72,7 @@ class IslamicEventController extends Controller
         $islamicEvent->update($data);
         $islamicEvent->books()->sync($request->input('book_ids', []));
 
-        return redirect()->route('admin.islamic-events.index')->with('success', 'اسلامی مجموعہ اپ ڈیٹ کر دیا گیا۔');
+        return redirect()->route('admin.islamic-events.index')->with('success', __('messages.flash.event_updated'));
     }
 
     public function destroy(IslamicEvent $islamicEvent): RedirectResponse
@@ -80,14 +83,16 @@ class IslamicEventController extends Controller
 
         $islamicEvent->delete();
 
-        return back()->with('success', 'اسلامی مجموعہ حذف کر دیا گیا۔');
+        return back()->with('success', __('messages.flash.event_deleted'));
     }
 
     private function validated(Request $request, bool $bannerNullable = true): array
     {
         return $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
+            'title_en' => ['required', 'string', 'max:255'],
+            'title_ur' => ['nullable', 'string', 'max:255'],
+            'description_en' => ['nullable', 'string'],
+            'description_ur' => ['nullable', 'string'],
             'banner_image' => [$bannerNullable ? 'nullable' : 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
@@ -95,5 +100,11 @@ class IslamicEventController extends Controller
             'book_ids' => ['nullable', 'array'],
             'book_ids.*' => ['exists:books,id'],
         ]);
+    }
+
+    private function setLegacyFields(array &$data): void
+    {
+        $data['title'] = $data['title_en'] ?: ($data['title_ur'] ?? '');
+        $data['description'] = $data['description_en'] ?: ($data['description_ur'] ?? null);
     }
 }

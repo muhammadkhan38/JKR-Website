@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasLocalizedFields;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,12 +12,16 @@ use Illuminate\Support\Facades\Storage;
 
 class IslamicEvent extends Model
 {
-    use HasFactory;
+    use HasFactory, HasLocalizedFields;
 
     protected $fillable = [
         'title',
+        'title_en',
+        'title_ur',
         'slug',
         'description',
+        'description_en',
+        'description_ur',
         'banner_image',
         'start_date',
         'end_date',
@@ -72,5 +77,15 @@ class IslamicEvent extends Model
     public function getBannerUrlAttribute(): ?string
     {
         return $this->banner_image ? Storage::disk('public')->url($this->banner_image) : null;
+    }
+
+    public function getLocalizedTitleAttribute(): string
+    {
+        return $this->localized('title') ?? '';
+    }
+
+    public function getLocalizedDescriptionAttribute(): ?string
+    {
+        return $this->localized('description');
     }
 }

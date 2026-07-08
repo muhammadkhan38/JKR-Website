@@ -24,7 +24,7 @@ class AuthController extends Controller
         ]);
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
-            return back()->withErrors(['email' => 'درج کردہ معلومات ہمارے ریکارڈ سے مطابقت نہیں رکھتیں۔'])->onlyInput('email');
+            return back()->withErrors(['email' => __('messages.auth.failed')])->onlyInput('email');
         }
 
         $request->session()->regenerate();
@@ -54,7 +54,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('home')->with('success', 'آپ کا اکاؤنٹ بنا دیا گیا ہے۔');
+        return redirect()->route('home')->with('success', __('messages.flash.registered'));
     }
 
     public function logout(Request $request): RedirectResponse
@@ -63,6 +63,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('home')->with('success', 'آپ لاگ آؤٹ ہو چکے ہیں۔');
+        return redirect()->route('home')->with('success', __('messages.flash.logged_out'));
     }
 }

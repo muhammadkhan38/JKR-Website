@@ -44,17 +44,17 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return back()->with('success', 'صارف کا کردار اپ ڈیٹ کر دیا گیا۔');
+        return back()->with('success', __('messages.flash.user_role_updated'));
     }
 
     public function destroy(Request $request, User $user): RedirectResponse
     {
         if ($request->user()->is($user)) {
-            return back()->with('error', 'آپ اپنا اکاؤنٹ حذف نہیں کر سکتے۔');
+            return back()->with('error', __('messages.flash.cannot_delete_self'));
         }
 
         $user->delete();
 
-        return back()->with('success', 'صارف حذف کر دیا گیا۔');
+        return back()->with('success', __('messages.flash.user_deleted'));
     }
 }

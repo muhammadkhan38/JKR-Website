@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasLocalizedFields;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Audio extends Model
 {
-    use HasFactory;
+    use HasFactory, HasLocalizedFields;
 
     protected $table = 'audios';
 
@@ -19,9 +20,15 @@ class Audio extends Model
         'category_id',
         'islamic_event_id',
         'title',
+        'title_en',
+        'title_ur',
         'slug',
         'speaker',
+        'speaker_en',
+        'speaker_ur',
         'description',
+        'description_en',
+        'description_ur',
         'audio_file',
         'duration',
         'is_active',
@@ -55,5 +62,20 @@ class Audio extends Model
     public function getAudioUrlAttribute(): ?string
     {
         return $this->audio_file ? Storage::disk('public')->url($this->audio_file) : null;
+    }
+
+    public function getLocalizedTitleAttribute(): string
+    {
+        return $this->localized('title') ?? '';
+    }
+
+    public function getLocalizedSpeakerAttribute(): ?string
+    {
+        return $this->localized('speaker');
+    }
+
+    public function getLocalizedDescriptionAttribute(): ?string
+    {
+        return $this->localized('description');
     }
 }
