@@ -36,7 +36,7 @@
                 <input class="form-input" id="duration" name="duration" value="{{ old('duration', $audioForm->duration) }}" placeholder="00:12:30">
             </div>
             <div>
-                <label class="form-label" for="description_en">{{ __('messages.admin.fields.description_en ') }}</label>
+                <label class="form-label" for="description_en">{{ __('messages.admin.fields.description_en') }}</label>
                 <textarea class="form-input" id="description_en" name="description_en" rows="3">{{ old('description_en', $audioForm->description_en ?: $audioForm->description) }}</textarea>
             </div>
             <div>

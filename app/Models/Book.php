@@ -35,6 +35,9 @@ class Book extends Model
         'pdf_file',
         'pdf_file_en',
         'pdf_file_ur',
+        'external_pdf_url',
+        'external_pdf_url_en',
+        'external_pdf_url_ur',
         'is_latest',
         'is_featured',
         'is_active',
@@ -95,7 +98,7 @@ class Book extends Model
 
     public function getPdfUrlAttribute(): ?string
     {
-        return $this->pdf_file ? Storage::disk('public')->url($this->pdf_file) : null;
+        return $this->resolvePdfUrl($this->pdf_file, $this->external_pdf_url);
     }
 
     public function getLocalizedTitleAttribute(): string
@@ -120,21 +123,51 @@ class Book extends Model
 
     public function getLocalizedPdfUrlAttribute(): ?string
     {
-        $path = $this->localizedPdfPath();
-
-        return $path ? Storage::disk('public')->url($path) : null;
+        return $this->localizedPdfUrl();
     }
 
     public function localizedPdfPath(?string $locale = null): ?string
     {
-        $locale = $locale ?? app()->getLocale();
-        $paths = $locale === 'ur'
-            ? [$this->pdf_file_ur, $this->pdf_file_en, $this->pdf_file]
-            : [$this->pdf_file_en, $this->pdf_file, $this->pdf_file_ur];
+        $source = $this->localizedPdfSource($locale);
 
-        foreach ($paths as $path) {
+        return ($source['type'] ?? null) === 'local' ? $source['value'] : null;
+    }
+
+    public function localizedExternalPdfUrl(?string $locale = null): ?string
+    {
+        foreach ($this->localizedPdfCandidates($locale) as [, $externalUrl]) {
+            $url = $this->validExternalPdfUrl($externalUrl);
+
+            if ($url) {
+                return $url;
+            }
+        }
+
+        return null;
+    }
+
+    public function localizedPdfUrl(?string $locale = null): ?string
+    {
+        $source = $this->localizedPdfSource($locale);
+
+        return match ($source['type'] ?? null) {
+            'local' => Storage::disk('public')->url($source['value']),
+            'external' => $source['value'],
+            default => null,
+        };
+    }
+
+    public function localizedPdfSource(?string $locale = null): ?array
+    {
+        foreach ($this->localizedPdfCandidates($locale) as [$path, $externalUrl]) {
             if (filled($path)) {
-                return $path;
+                return ['type' => 'local', 'value' => $path];
+            }
+
+            $url = $this->validExternalPdfUrl($externalUrl);
+
+            if ($url) {
+                return ['type' => 'external', 'value' => $url];
             }
         }
 
@@ -147,6 +180,42 @@ class Book extends Model
 
         return $locale === 'ur'
             && blank($this->pdf_file_ur)
-            && filled($this->localizedPdfPath($locale));
+            && blank($this->validExternalPdfUrl($this->external_pdf_url_ur))
+            && filled($this->localizedPdfUrl($locale));
+    }
+
+    private function resolvePdfUrl(?string $path, ?string $externalUrl): ?string
+    {
+        if (filled($path)) {
+            return Storage::disk('public')->url($path);
+        }
+
+        return $this->validExternalPdfUrl($externalUrl);
+    }
+
+    private function validExternalPdfUrl(?string $externalUrl): ?string
+    {
+        if (blank($externalUrl)) {
+            return null;
+        }
+
+        return filter_var($externalUrl, FILTER_VALIDATE_URL) ? $externalUrl : null;
+    }
+
+    private function localizedPdfCandidates(?string $locale = null): array
+    {
+        $locale = $locale ?? app()->getLocale();
+
+        return $locale === 'ur'
+            ? [
+                [$this->pdf_file_ur, $this->external_pdf_url_ur],
+                [$this->pdf_file_en, $this->external_pdf_url_en],
+                [$this->pdf_file, $this->external_pdf_url],
+            ]
+            : [
+                [$this->pdf_file_en, $this->external_pdf_url_en],
+                [$this->pdf_file, $this->external_pdf_url],
+                [$this->pdf_file_ur, $this->external_pdf_url_ur],
+            ];
     }
 }

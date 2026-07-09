@@ -85,9 +85,21 @@ class BookController extends Controller
     {
         abort_unless($book->is_active && $book->download_allowed, 403);
 
-        $pdfPath = $book->localizedPdfPath();
+        $pdfSource = $book->localizedPdfSource();
+
+        if (($pdfSource['type'] ?? null) === 'external') {
+            return redirect()->away($pdfSource['value']);
+        }
+
+        $pdfPath = ($pdfSource['type'] ?? null) === 'local' ? $pdfSource['value'] : null;
 
         if (! $pdfPath || ! Storage::disk('public')->exists($pdfPath)) {
+            $externalPdfUrl = $book->localizedExternalPdfUrl();
+
+            if ($externalPdfUrl) {
+                return redirect()->away($externalPdfUrl);
+            }
+
             return back()->with('error', __('messages.books.download_unavailable'));
         }
 

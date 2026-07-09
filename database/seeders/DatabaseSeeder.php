@@ -245,6 +245,8 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $this->call(MuftiAhmadMumtazBookSeeder::class);
+
         foreach ([
             'madrasa_name' => 'Madrasa Islamic Books',
             'madrasa_name_en' => 'Madrasa Islamic Books',
