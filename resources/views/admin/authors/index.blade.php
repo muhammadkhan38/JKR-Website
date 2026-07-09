@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', __('messages.admin.authors.manage'))
+@section('title', __(' messages.admin.authors.manage'))
 @section('heading', __('messages.admin.authors.manage'))
 
 @section('content')
