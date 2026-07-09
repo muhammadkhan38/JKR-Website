@@ -5,8 +5,9 @@
 @section('content')
 @php
     $hasPdf = filled($pdf);
-    $startsWithPdfJs = $hasPdf;
-    $primaryPreviewUrl = $hasPdf ? $pdfJsUrl : null;
+    $nativePreviewUrl = $hasPdf ? route('books.pdf', $book) : null;
+    $startsWithPdfJs = false;
+    $primaryPreviewUrl = $nativePreviewUrl;
     $drivePreviewUrl = $hasPdf && $pdf['is_google_drive'] ? $pdf['preview_url'] : null;
 @endphp
 
@@ -18,6 +19,9 @@
         </div>
         <div class="flex flex-wrap gap-2">
             <a href="{{ route('books.index') }}" class="rounded-md border border-emerald-200 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-50">{{ __('messages.reader.back_to_books') }}</a>
+            @if($hasPdf)
+                <button type="button" data-use-pdfjs class="rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">{{ __('messages.reader.fallback_reader') }}</button>
+            @endif
             @if($drivePreviewUrl)
                 <button type="button" data-use-drive-preview class="rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">{{ __('messages.reader.drive_preview') }}</button>
             @endif
@@ -35,6 +39,7 @@
         <div
             data-pdf-reader
             data-fallback-url="{{ $pdfJsUrl }}"
+            data-native-url="{{ $nativePreviewUrl }}"
             data-drive-preview-url="{{ $drivePreviewUrl }}"
             data-starts-pdfjs="{{ $startsWithPdfJs ? 1 : 0 }}"
             class="overflow-hidden rounded-md border border-emerald-100 bg-white shadow-sm"
@@ -61,7 +66,7 @@
                 </div>
             </div>
 
-            <div class="relative h-[72vh] min-h-[460px] bg-slate-100 sm:h-[78vh] sm:min-h-[560px]">
+            <div class="relative h-[78vh] min-h-[520px] bg-slate-100 sm:h-[82vh] sm:min-h-[620px]">
                 <div data-pdf-loading class="absolute inset-0 z-10 grid place-items-center bg-white/95 px-6 text-center">
                     <div>
                         <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-emerald-100 border-t-emerald-700"></div>
@@ -115,6 +120,7 @@
             const pageInput = reader.querySelector('[data-pdf-page-input]');
             const totalPages = reader.querySelector('[data-pdf-total-pages]');
             const fallbackUrl = reader.dataset.fallbackUrl;
+            const nativeUrl = reader.dataset.nativeUrl;
             const drivePreviewUrl = reader.dataset.drivePreviewUrl;
             let usingPdfJs = reader.dataset.startsPdfjs === '1';
             let primaryLoaded = false;
@@ -147,8 +153,20 @@
                 toolbar?.classList.remove('hidden');
                 frame.src = fallbackUrl;
             };
+            const switchToNativePreview = () => {
+                if (! nativeUrl || (! usingPdfJs && frame.src === nativeUrl)) {
+                    return;
+                }
+
+                usingPdfJs = false;
+                primaryLoaded = false;
+                showLoading();
+                hideError();
+                toolbar?.classList.add('hidden');
+                frame.src = nativeUrl;
+            };
             const switchToDrivePreview = () => {
-                if (! drivePreviewUrl || ! usingPdfJs) {
+                if (! drivePreviewUrl) {
                     return;
                 }
 
@@ -188,14 +206,6 @@
 
                 showError(@json(__('messages.reader.error_text')));
             });
-
-            if (! usingPdfJs && fallbackUrl) {
-                window.setTimeout(() => {
-                    if (! primaryLoaded) {
-                        switchToPdfJs();
-                    }
-                }, 12000);
-            }
 
             document.querySelectorAll('[data-use-pdfjs]').forEach((button) => {
                 button.addEventListener('click', switchToPdfJs);
