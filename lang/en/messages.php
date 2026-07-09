@@ -9,6 +9,7 @@ return [
     'language' => [
         'label' => 'Language',
         'english' => 'English',
+        'arabic' => 'Arabic',
         'urdu' => 'اردو',
     ],
     'nav' => [
@@ -29,6 +30,8 @@ return [
         'all_books' => 'All Books',
         'audio_lessons' => 'Audio Lectures',
         'contact_madrasa' => 'Contact the Madrasa',
+        'facebook' => 'Facebook',
+        'youtube' => 'YouTube',
         'default_about' => 'A simple madrasa library where useful Islamic books can be read, heard, downloaded, and saved.',
         'default_text' => 'May Allah accept this knowledge and make it beneficial.',
     ],
@@ -42,6 +45,7 @@ return [
         'download_pdf' => 'Download PDF',
         'contact' => 'Contact',
         'whatsapp' => 'WhatsApp',
+        'whatsapp_short' => 'WA',
         'featured' => 'Featured',
         'latest' => 'New',
         'latest_books' => 'Latest Books',

@@ -3,11 +3,11 @@
 @section('title', __('messages.admin.books.manage'))
 @section('heading', __('messages.admin.books.manage'))
 @section('actions')
-    <a href="{{ route('admin.books.create') }}" class="rounded-md bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800">{{ __('messages.admin.books.add') }}</a>
+    <a href="{{ route('admin.books.create') }}" class="btn btn-primary btn-sm">{{ __('messages.admin.books.add') }}</a>
 @endsection
 
 @section('content')
-<div class="rounded-md border border-slate-200 bg-white shadow-sm">
+<div class="admin-panel overflow-hidden">
     <div class="overflow-x-auto">
         <table class="admin-table">
             <thead>
@@ -23,18 +23,20 @@
                 @forelse($books as $book)
                     <tr>
                         <td>
-                            <div class="font-semibold text-slate-950">{{ $book->localized_title }}</div>
-                            <div class="text-xs text-slate-500">{{ collect([$book->localized_language, $book->created_at->format('d-m-Y')])->filter()->implode(__('messages.common.separator')) }}</div>
+                            <div class="font-extrabold text-slate-950">{{ $book->localized_title }}</div>
+                            <div class="mt-1 text-xs font-semibold text-slate-500">{{ collect([$book->localized_language, $book->created_at->format('d-m-Y')])->filter()->implode(__('messages.common.separator')) }}</div>
                         </td>
                         <td>{{ $book->author?->localized_name }}</td>
                         <td>{{ $book->category?->localized_name }}</td>
-                        <td class="space-x-1">
-                            @if($book->is_active)<span class="status-badge bg-emerald-100 text-emerald-800">{{ __('messages.common.active') }}</span>@endif
-                            @if($book->is_featured)<span class="status-badge bg-amber-100 text-amber-800">{{ __('messages.common.featured') }}</span>@endif
-                            @if($book->is_latest)<span class="status-badge bg-sky-100 text-sky-800">{{ __('messages.common.latest') }}</span>@endif
+                        <td>
+                            <div class="flex flex-wrap gap-1">
+                                @if($book->is_active)<span class="status-badge bg-emerald-100 text-emerald-800">{{ __('messages.common.active') }}</span>@endif
+                                @if($book->is_featured)<span class="status-badge bg-amber-100 text-amber-800">{{ __('messages.common.featured') }}</span>@endif
+                                @if($book->is_latest)<span class="status-badge bg-sky-100 text-sky-800">{{ __('messages.common.latest') }}</span>@endif
+                            </div>
                         </td>
                         <td>
-                            <div class="flex gap-2">
+                            <div class="flex flex-wrap gap-2">
                                 <a href="{{ route('admin.books.edit', $book) }}" class="admin-action">{{ __('messages.common.edit') }}</a>
                                 <form method="POST" action="{{ route('admin.books.destroy', $book) }}" data-confirm-delete>
                                     @csrf @method('DELETE')

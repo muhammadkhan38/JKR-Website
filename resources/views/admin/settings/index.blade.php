@@ -4,11 +4,11 @@
 @section('heading', __('messages.admin.settings.title'))
 
 @section('content')
-<form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data" class="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
+<form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data" class="admin-panel p-5 sm:p-6">
     @csrf
     <div class="grid gap-5 lg:grid-cols-2">
         <div>
-            <h2 class="mb-4 text-lg font-bold text-slate-950">{{ __('messages.admin.settings.english_content') }}</h2>
+            <h2 class="mb-4 text-xl font-extrabold text-slate-950">{{ __('messages.admin.settings.english_content') }}</h2>
             <label class="form-label" for="madrasa_name_en">{{ __('messages.admin.fields.madrasa_name_en') }}</label>
             <input class="form-input" id="madrasa_name_en" name="madrasa_name_en" value="{{ old('madrasa_name_en', $settings['madrasa_name_en'] ?? $settings['madrasa_name'] ?? '') }}">
             <label class="form-label mt-4" for="address_en">{{ __('messages.admin.fields.address_en') }}</label>
@@ -19,7 +19,7 @@
             <textarea class="form-input" id="footer_text_en" name="footer_text_en" rows="3">{{ old('footer_text_en', $settings['footer_text_en'] ?? $settings['footer_text'] ?? '') }}</textarea>
         </div>
         <div>
-            <h2 class="mb-4 text-lg font-bold text-slate-950">{{ __('messages.admin.settings.urdu_content') }}</h2>
+            <h2 class="mb-4 text-xl font-extrabold text-slate-950">{{ __('messages.admin.settings.urdu_content') }}</h2>
             <label class="form-label" for="madrasa_name_ur">{{ __('messages.admin.fields.madrasa_name_ur') }}</label>
             <input class="form-input" id="madrasa_name_ur" name="madrasa_name_ur" value="{{ old('madrasa_name_ur', $settings['madrasa_name_ur'] ?? '') }}" dir="rtl">
             <label class="form-label mt-4" for="address_ur">{{ __('messages.admin.fields.address_ur') }}</label>
@@ -57,14 +57,14 @@
         <div>
             <label class="form-label" for="logo">{{ __('messages.admin.fields.logo') }}</label>
             <input class="form-input" id="logo" type="file" name="logo" accept=".jpg,.jpeg,.png,.webp" data-file-label="#logo-file-name">
-            <p id="logo-file-name" class="mt-2 text-sm text-slate-500">{{ ! empty($settings['logo']) ? __('messages.common.current_file', ['file' => $settings['logo']]) : '' }}</p>
+            <p id="logo-file-name" class="form-hint">{{ ! empty($settings['logo']) ? __('messages.common.current_file', ['file' => $settings['logo']]) : '' }}</p>
         </div>
         <div>
             <label class="form-label" for="homepage_banner">{{ __('messages.admin.fields.homepage_banner') }}</label>
             <input class="form-input" id="homepage_banner" type="file" name="homepage_banner" accept=".jpg,.jpeg,.png,.webp" data-file-label="#banner-file-name">
-            <p id="banner-file-name" class="mt-2 text-sm text-slate-500">{{ ! empty($settings['homepage_banner']) ? __('messages.common.current_file', ['file' => $settings['homepage_banner']]) : '' }}</p>
+            <p id="banner-file-name" class="form-hint">{{ ! empty($settings['homepage_banner']) ? __('messages.common.current_file', ['file' => $settings['homepage_banner']]) : '' }}</p>
         </div>
     </div>
-    <button class="mt-6 rounded-md bg-emerald-700 px-5 py-3 font-semibold text-white hover:bg-emerald-800">{{ __('messages.common.save') }}</button>
+    <button class="btn btn-primary btn-lg mt-6">{{ __('messages.common.save') }}</button>
 </form>
 @endsection

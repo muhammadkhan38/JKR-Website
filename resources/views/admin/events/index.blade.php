@@ -7,11 +7,11 @@
 @php($eventForm = $editing ?? new \App\Models\IslamicEvent(['is_active' => true, 'display_order' => 0]))
 @php($selectedBooks = old('book_ids', $eventForm->exists ? $eventForm->books->pluck('id')->all() : []))
 <div class="grid gap-6 xl:grid-cols-[460px_1fr]">
-    <form method="POST" action="{{ $eventForm->exists ? route('admin.islamic-events.update', $eventForm) : route('admin.islamic-events.store') }}" enctype="multipart/form-data" class="rounded-md border border-slate-200 bg-white p-5 shadow-sm">
+    <form method="POST" action="{{ $eventForm->exists ? route('admin.islamic-events.update', $eventForm) : route('admin.islamic-events.store') }}" enctype="multipart/form-data" class="admin-panel p-5">
         @csrf
         @if($eventForm->exists) @method('PUT') @endif
-        <h2 class="mb-4 text-lg font-bold">{{ $eventForm->exists ? __('messages.admin.events.edit') : __('messages.admin.events.add') }}</h2>
-        <div class="space-y-4">
+        <h2 class="mb-5 text-xl font-extrabold text-slate-950">{{ $eventForm->exists ? __('messages.admin.events.edit') : __('messages.admin.events.add') }}</h2>
+        <div class="space-y-5">
             <div class="grid gap-3 sm:grid-cols-2">
                 <div>
                     <label class="form-label" for="title_en">{{ __('messages.admin.fields.title_en') }}</label>
@@ -47,7 +47,7 @@
             <div>
                 <label class="form-label" for="banner_image">{{ __('messages.admin.fields.banner_image') }}</label>
                 <input class="form-input" id="banner_image" type="file" name="banner_image" accept=".jpg,.jpeg,.png,.webp" data-file-label="#banner-file-name">
-                <p id="banner-file-name" class="mt-2 text-sm text-slate-500">{{ $eventForm->banner_image ? __('messages.common.current_file', ['file' => $eventForm->banner_image]) : '' }}</p>
+                <p id="banner-file-name" class="form-hint">{{ $eventForm->banner_image ? __('messages.common.current_file', ['file' => $eventForm->banner_image]) : '' }}</p>
             </div>
             <div>
                 <label class="form-label" for="book_ids">{{ __('messages.admin.fields.linked_books') }}</label>
@@ -56,46 +56,56 @@
                         <option value="{{ $book->id }}" @selected(in_array($book->id, $selectedBooks))>{{ $book->localized_title }}</option>
                     @endforeach
                 </select>
-                <p class="mt-1 text-xs text-slate-500">{{ __('messages.admin.events.select_books_hint') }}</p>
+                <p class="form-hint">{{ __('messages.admin.events.select_books_hint') }}</p>
             </div>
-            <label class="flex items-center gap-2 text-sm font-medium"><input type="checkbox" name="is_active" value="1" @checked(old('is_active', $eventForm->is_active))> {{ __('messages.common.active') }}</label>
+            <label class="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-bold text-slate-700">
+                <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $eventForm->is_active))>
+                {{ __('messages.common.active') }}
+            </label>
         </div>
-        <button class="mt-5 rounded-md bg-emerald-700 px-4 py-2 font-semibold text-white">{{ $eventForm->exists ? __('messages.common.update') : __('messages.common.create') }}</button>
+        <button class="btn btn-primary mt-6">{{ $eventForm->exists ? __('messages.common.update') : __('messages.common.create') }}</button>
     </form>
-    <div class="rounded-md border border-slate-200 bg-white shadow-sm">
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>{{ __('messages.admin.events.collection') }}</th>
-                    <th>{{ __('messages.admin.events.dates') }}</th>
-                    <th>{{ __('messages.nav.books') }}</th>
-                    <th>{{ __('messages.admin.fields.status') }}</th>
-                    <th>{{ __('messages.admin.fields.action') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($events as $event)
+
+    <div class="admin-panel overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="admin-table">
+                <thead>
                     <tr>
-                        <td>
-                            <div class="font-semibold">{{ $event->localized_title }}</div>
-                            <div class="text-xs text-slate-500">{{ __('messages.admin.events.order', ['number' => $event->display_order]) }}</div>
-                        </td>
-                        <td>{{ optional($event->start_date)->format('d-m-Y') ?: __('messages.common.any') }} - {{ optional($event->end_date)->format('d-m-Y') ?: __('messages.common.any') }}</td>
-                        <td>{{ $event->books_count }}</td>
-                        <td>{{ $event->is_active ? __('messages.common.active') : __('messages.common.inactive') }}</td>
-                        <td class="flex gap-2">
-                            <a class="admin-action" href="{{ route('admin.islamic-events.edit', $event) }}">{{ __('messages.common.edit') }}</a>
-                            <form method="POST" action="{{ route('admin.islamic-events.destroy', $event) }}" data-confirm-delete>
-                                @csrf @method('DELETE')
-                                <button class="admin-danger">{{ __('messages.common.delete') }}</button>
-                            </form>
-                        </td>
+                        <th>{{ __('messages.admin.events.collection') }}</th>
+                        <th>{{ __('messages.admin.events.dates') }}</th>
+                        <th>{{ __('messages.nav.books') }}</th>
+                        <th>{{ __('messages.admin.fields.status') }}</th>
+                        <th>{{ __('messages.admin.fields.action') }}</th>
                     </tr>
-                @empty
-                    <tr><td colspan="5">{{ __('messages.admin.events.no_events') }}</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse($events as $event)
+                        <tr>
+                            <td>
+                                <div class="font-extrabold text-slate-950">{{ $event->localized_title }}</div>
+                                <div class="mt-1 text-xs font-semibold text-slate-500">{{ __('messages.admin.events.order', ['number' => $event->display_order]) }}</div>
+                            </td>
+                            <td>{{ optional($event->start_date)->format('d-m-Y') ?: __('messages.common.any') }} - {{ optional($event->end_date)->format('d-m-Y') ?: __('messages.common.any') }}</td>
+                            <td>{{ $event->books_count }}</td>
+                            <td>
+                                <span class="status-badge {{ $event->is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700' }}">{{ $event->is_active ? __('messages.common.active') : __('messages.common.inactive') }}</span>
+                            </td>
+                            <td>
+                                <div class="flex flex-wrap gap-2">
+                                    <a class="admin-action" href="{{ route('admin.islamic-events.edit', $event) }}">{{ __('messages.common.edit') }}</a>
+                                    <form method="POST" action="{{ route('admin.islamic-events.destroy', $event) }}" data-confirm-delete>
+                                        @csrf @method('DELETE')
+                                        <button class="admin-danger">{{ __('messages.common.delete') }}</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="5">{{ __('messages.admin.events.no_events') }}</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
         <div class="p-4">{{ $events->links() }}</div>
     </div>
 </div>

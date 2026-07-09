@@ -6,11 +6,11 @@
 @section('content')
 @php($audioForm = $editing ?? new \App\Models\Audio(['is_active' => true]))
 <div class="grid gap-6 xl:grid-cols-[460px_1fr]">
-    <form method="POST" action="{{ $audioForm->exists ? route('admin.audios.update', $audioForm) : route('admin.audios.store') }}" enctype="multipart/form-data" class="rounded-md border border-slate-200 bg-white p-5 shadow-sm">
+    <form method="POST" action="{{ $audioForm->exists ? route('admin.audios.update', $audioForm) : route('admin.audios.store') }}" enctype="multipart/form-data" class="admin-panel p-5">
         @csrf
         @if($audioForm->exists) @method('PUT') @endif
-        <h2 class="mb-4 text-lg font-bold">{{ $audioForm->exists ? __('messages.admin.audios.edit') : __('messages.admin.audios.add') }}</h2>
-        <div class="space-y-4">
+        <h2 class="mb-5 text-xl font-extrabold text-slate-950">{{ $audioForm->exists ? __('messages.admin.audios.edit') : __('messages.admin.audios.add') }}</h2>
+        <div class="space-y-5">
             <div class="grid gap-3 sm:grid-cols-2">
                 <div>
                     <label class="form-label" for="title_en">{{ __('messages.admin.fields.title_en') }}</label>
@@ -46,7 +46,7 @@
             <div>
                 <label class="form-label" for="audio_file">{{ __('messages.admin.fields.audio_file') }}</label>
                 <input class="form-input" id="audio_file" type="file" name="audio_file" accept=".mp3,.wav,.m4a" data-file-label="#audio-file-name" @required(! $audioForm->exists)>
-                <p id="audio-file-name" class="mt-2 text-sm text-slate-500">{{ $audioForm->audio_file ? __('messages.common.current_file', ['file' => $audioForm->audio_file]) : '' }}</p>
+                <p id="audio-file-name" class="form-hint">{{ $audioForm->audio_file ? __('messages.common.current_file', ['file' => $audioForm->audio_file]) : '' }}</p>
             </div>
             <div>
                 <label class="form-label" for="book_id">{{ __('messages.admin.fields.related_book') }}</label>
@@ -77,42 +77,49 @@
                     </select>
                 </div>
             </div>
-            <label class="flex items-center gap-2 text-sm font-medium"><input type="checkbox" name="is_active" value="1" @checked(old('is_active', $audioForm->is_active))> {{ __('messages.common.active') }}</label>
+            <label class="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-bold text-slate-700">
+                <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $audioForm->is_active))>
+                {{ __('messages.common.active') }}
+            </label>
         </div>
-        <button class="mt-5 rounded-md bg-emerald-700 px-4 py-2 font-semibold text-white">{{ $audioForm->exists ? __('messages.common.update') : __('messages.common.create') }}</button>
+        <button class="btn btn-primary mt-6">{{ $audioForm->exists ? __('messages.common.update') : __('messages.common.create') }}</button>
     </form>
-    <div class="rounded-md border border-slate-200 bg-white shadow-sm">
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>{{ __('messages.admin.audios.audio') }}</th>
-                    <th>{{ __('messages.admin.audios.linked_to') }}</th>
-                    <th>{{ __('messages.admin.fields.status') }}</th>
-                    <th>{{ __('messages.admin.fields.action') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($audios as $audio)
+    <div class="admin-panel overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="admin-table">
+                <thead>
                     <tr>
-                        <td>
-                            <div class="font-semibold">{{ $audio->localized_title }}</div>
-                            <div class="text-xs text-slate-500">{{ $audio->localized_speaker ?: __('messages.admin.audios.no_speaker') }}</div>
-                        </td>
-                        <td>{{ $audio->book?->localized_title ?? $audio->category?->localized_name ?? $audio->islamicEvent?->localized_title ?? __('messages.common.general') }}</td>
-                        <td>{{ $audio->is_active ? __('messages.common.active') : __('messages.common.inactive') }}</td>
-                        <td class="flex gap-2">
-                            <a class="admin-action" href="{{ route('admin.audios.edit', $audio) }}">{{ __('messages.common.edit') }}</a>
-                            <form method="POST" action="{{ route('admin.audios.destroy', $audio) }}" data-confirm-delete>
-                                @csrf @method('DELETE')
-                                <button class="admin-danger">{{ __('messages.common.delete') }}</button>
-                            </form>
-                        </td>
+                        <th>{{ __('messages.admin.audios.audio') }}</th>
+                        <th>{{ __('messages.admin.audios.linked_to') }}</th>
+                        <th>{{ __('messages.admin.fields.status') }}</th>
+                        <th>{{ __('messages.admin.fields.action') }}</th>
                     </tr>
-                @empty
-                    <tr><td colspan="4">{{ __('messages.admin.audios.no_audios') }}</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse($audios as $audio)
+                        <tr>
+                            <td>
+                                <div class="font-extrabold text-slate-950">{{ $audio->localized_title }}</div>
+                                <div class="mt-1 text-xs font-semibold text-slate-500">{{ $audio->localized_speaker ?: __('messages.admin.audios.no_speaker') }}</div>
+                            </td>
+                            <td>{{ $audio->book?->localized_title ?? $audio->category?->localized_name ?? $audio->islamicEvent?->localized_title ?? __('messages.common.general') }}</td>
+                            <td><span class="status-badge {{ $audio->is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700' }}">{{ $audio->is_active ? __('messages.common.active') : __('messages.common.inactive') }}</span></td>
+                            <td>
+                                <div class="flex flex-wrap gap-2">
+                                    <a class="admin-action" href="{{ route('admin.audios.edit', $audio) }}">{{ __('messages.common.edit') }}</a>
+                                    <form method="POST" action="{{ route('admin.audios.destroy', $audio) }}" data-confirm-delete>
+                                        @csrf @method('DELETE')
+                                        <button class="admin-danger">{{ __('messages.common.delete') }}</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="4">{{ __('messages.admin.audios.no_audios') }}</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
         <div class="p-4">{{ $audios->links() }}</div>
     </div>
 </div>

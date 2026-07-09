@@ -9,6 +9,7 @@ return [
     'language' => [
         'label' => 'زبان',
         'english' => 'English',
+        'arabic' => 'Arabic',
         'urdu' => 'اردو',
     ],
     'nav' => [
@@ -24,6 +25,8 @@ return [
         'menu' => 'مینو',
     ],
     'footer' => [
+        'facebook' => 'Facebook',
+        'youtube' => 'YouTube',
         'contact' => 'رابطہ',
         'quick_links' => 'اہم روابط',
         'all_books' => 'تمام کتب',
@@ -33,6 +36,7 @@ return [
         'default_text' => 'اللہ تعالیٰ اس علم کو قبول فرمائے اور نفع بخش بنائے۔',
     ],
     'common' => [
+        'whatsapp_short' => 'WA',
         'search' => 'تلاش',
         'filter' => 'فلٹر',
         'view_all' => 'سب دیکھیں',

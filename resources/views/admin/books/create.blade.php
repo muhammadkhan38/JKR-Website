@@ -4,7 +4,7 @@
 @section('heading', __('messages.admin.books.add'))
 
 @section('content')
-<form method="POST" action="{{ route('admin.books.store') }}" enctype="multipart/form-data" class="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
+<form method="POST" action="{{ route('admin.books.store') }}" enctype="multipart/form-data" class="admin-panel p-5 sm:p-6">
     @include('admin.books._form')
 </form>
 @endsection

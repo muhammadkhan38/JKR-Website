@@ -1,6 +1,9 @@
-@php($site = \App\Models\Setting::localizedPairs())
+@php
+    $site = \App\Models\Setting::localizedPairs();
+    $isRtl = in_array(app()->getLocale(), ['ur', 'ar'], true);
+@endphp
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ur' ? 'rtl' : 'ltr' }}">
+<html lang="{{ app()->getLocale() }}" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,14 +12,21 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
-<body class="{{ app()->getLocale() === 'ur' ? 'font-urdu' : 'font-english' }} bg-slate-100 text-slate-900 antialiased">
-    <div class="min-h-screen lg:flex">
-        <aside class="border-b border-slate-200 bg-white lg:min-h-screen lg:w-72 lg:border-b-0 lg:border-r">
-            <div class="flex items-center justify-between px-5 py-5 lg:block">
-                <a href="{{ route('admin.dashboard') }}" class="text-lg font-bold text-emerald-950">{{ $site['madrasa_name'] ?? __('messages.admin.panel') }}</a>
+<body class="{{ $isRtl ? 'font-urdu' : 'font-english' }} bg-slate-100 text-slate-900 antialiased">
+    <div class="admin-shell">
+        <aside class="admin-sidebar">
+            <div class="flex items-center justify-between gap-4 px-5 py-5 lg:block">
+                <a href="{{ route('admin.dashboard') }}" class="flex min-w-0 items-center gap-3">
+                    @if(! empty($site['logo']))
+                        <img src="{{ Storage::disk('public')->url($site['logo']) }}" alt="{{ $site['madrasa_name'] ?? __('messages.admin.panel') }}" class="h-11 w-11 rounded-xl object-cover">
+                    @else
+                        <span class="brand-mark h-11 w-11">{{ __('messages.meta.logo_letter') }}</span>
+                    @endif
+                    <span class="truncate text-lg font-extrabold text-emerald-950">{{ $site['madrasa_name'] ?? __('messages.admin.panel') }}</span>
+                </a>
                 <div class="flex items-center gap-2 lg:hidden">
                     @include('partials.language-switcher')
-                    <button id="admin-menu-button" class="rounded-md border px-3 py-2 text-sm" type="button">{{ __('messages.nav.menu') }}</button>
+                    <button id="admin-menu-button" class="mobile-menu-toggle" type="button" aria-controls="admin-nav" aria-expanded="false">{{ __('messages.nav.menu') }}</button>
                 </div>
             </div>
             <nav id="admin-nav" class="hidden px-3 pb-5 lg:block">
@@ -33,12 +43,12 @@
                 ])
                 <div class="space-y-1">
                     @foreach($links as [$label, $url])
-                        <a href="{{ $url }}" class="block rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-800">{{ $label }}</a>
+                        <a href="{{ $url }}" class="admin-nav-link">{{ $label }}</a>
                     @endforeach
                 </div>
                 <form method="POST" action="{{ route('logout') }}" class="mt-5">
                     @csrf
-                    <button class="w-full rounded-md border border-slate-200 px-3 py-2 text-start text-sm font-medium text-slate-700 hover:bg-slate-50" type="submit">{{ __('messages.nav.logout') }}</button>
+                    <button class="btn btn-muted w-full justify-start" type="submit">{{ __('messages.nav.logout') }}</button>
                 </form>
                 <div class="mt-5 hidden lg:block">
                     @include('partials.language-switcher')
@@ -49,10 +59,10 @@
         <main class="flex-1">
             <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 @include('partials.flash')
-                <div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div class="mb-6 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <p class="text-sm font-semibold tracking-wide text-emerald-700">{{ __('messages.admin.panel') }}</p>
-                        <h1 class="text-2xl font-bold text-slate-950">@yield('heading', __('messages.admin.dashboard'))</h1>
+                        <p class="text-sm font-extrabold uppercase text-emerald-700">{{ __('messages.admin.panel') }}</p>
+                        <h1 class="mt-1 text-2xl font-extrabold text-slate-950">@yield('heading', __('messages.admin.dashboard'))</h1>
                     </div>
                     @yield('actions')
                 </div>
@@ -63,7 +73,9 @@
 
     <script>
         $('#admin-menu-button').on('click', function () {
-            $('#admin-nav').toggleClass('hidden');
+            const nav = $('#admin-nav');
+            const isOpen = nav.toggleClass('hidden').is(':visible');
+            $(this).attr('aria-expanded', isOpen ? 'true' : 'false');
         });
 
         $('[data-confirm-delete]').on('submit', function (event) {

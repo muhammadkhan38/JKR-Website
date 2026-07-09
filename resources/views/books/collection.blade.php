@@ -9,14 +9,14 @@
             <p class="section-kicker">{{ __('messages.books.library') }}</p>
             <h1 class="section-heading">{{ $title }}</h1>
         </div>
-        <a href="{{ route('books.index') }}" class="btn-secondary">{{ __('messages.reader.back_to_library') }}</a>
+        <a href="{{ route('books.index') }}" class="btn btn-secondary btn-sm">{{ __('messages.reader.back_to_library') }}</a>
     </div>
 
-    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         @forelse($books as $book)
             @include('partials.book-card', ['book' => $book])
         @empty
-            <p class="rounded-lg border border-dashed border-emerald-200 bg-white p-6 text-stone-600">{{ __('messages.books.empty') }}</p>
+            <p class="surface-card p-6 text-stone-600">{{ __('messages.books.empty') }}</p>
         @endforelse
     </div>
 

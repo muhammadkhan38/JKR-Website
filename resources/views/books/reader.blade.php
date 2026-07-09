@@ -11,28 +11,29 @@
     $drivePreviewUrl = $hasPdf && $pdf['is_google_drive'] ? $pdf['preview_url'] : null;
 @endphp
 
-<section class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-    <div class="mb-5 flex flex-col gap-4 rounded-md border border-emerald-100 bg-white p-4 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+<section class="mx-auto max-w-[1500px] px-3 py-5 sm:px-6 lg:px-8">
+    <div class="mb-4 flex flex-col gap-4 rounded-2xl border border-emerald-900/10 bg-white p-4 shadow-sm lg:flex-row lg:items-center lg:justify-between">
         <div class="min-w-0">
             <p class="section-kicker">{{ __('messages.reader.kicker') }}</p>
-            <h1 class="mt-1 break-words text-2xl font-bold leading-tight text-emerald-950 sm:text-3xl">{{ $book->localized_title }}</h1>
+            <h1 class="mt-1 break-words text-2xl font-extrabold leading-tight text-emerald-950 sm:text-3xl">{{ $book->localized_title }}</h1>
         </div>
         <div class="flex flex-wrap gap-2">
-            <a href="{{ route('books.index') }}" class="rounded-md border border-emerald-200 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-50">{{ __('messages.reader.back_to_books') }}</a>
+            <a href="{{ route('books.show', $book) }}" class="btn btn-secondary btn-sm">{{ __('messages.reader.back_to_details') }}</a>
+            <a href="{{ route('books.index') }}" class="btn btn-muted btn-sm">{{ __('messages.reader.back_to_books') }}</a>
             @if($hasPdf)
-                <button type="button" data-use-pdfjs class="rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">{{ __('messages.reader.fallback_reader') }}</button>
+                <button type="button" data-use-pdfjs class="btn btn-muted btn-sm">{{ __('messages.reader.fallback_reader') }}</button>
             @endif
             @if($drivePreviewUrl)
-                <button type="button" data-use-drive-preview class="rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">{{ __('messages.reader.drive_preview') }}</button>
+                <button type="button" data-use-drive-preview class="btn btn-muted btn-sm">{{ __('messages.reader.drive_preview') }}</button>
             @endif
             @if($hasPdf && $book->download_allowed)
-                <a href="{{ route('books.download', $book) }}" target="_blank" rel="noopener" class="rounded-md bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800">{{ __('messages.common.download_pdf') }}</a>
+                <a href="{{ route('books.download', $book) }}" target="_blank" rel="noopener" class="btn btn-primary btn-sm">{{ __('messages.common.download_pdf') }}</a>
             @endif
         </div>
     </div>
 
     @if($book->isUsingFallbackPdf())
-        <div class="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">{{ __('messages.reader.urdu_unavailable') }}</div>
+        <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900">{{ __('messages.reader.urdu_unavailable') }}</div>
     @endif
 
     @if($hasPdf)
@@ -42,45 +43,50 @@
             data-native-url="{{ $nativePreviewUrl }}"
             data-drive-preview-url="{{ $drivePreviewUrl }}"
             data-starts-pdfjs="{{ $startsWithPdfJs ? 1 : 0 }}"
-            class="overflow-hidden rounded-md border border-emerald-100 bg-white shadow-sm"
+            class="reader-shell"
         >
-            <div data-pdfjs-toolbar class="{{ $startsWithPdfJs ? '' : 'hidden' }} border-b border-slate-200 bg-slate-50 px-3 py-3">
-                <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div data-pdfjs-toolbar class="{{ $startsWithPdfJs ? '' : 'hidden' }} reader-toolbar">
+                <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                     <div class="flex flex-wrap items-center gap-2">
-                        <button type="button" data-pdf-command="previous-page" class="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">{{ __('messages.reader.previous_page') }}</button>
-                        <button type="button" data-pdf-command="next-page" class="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">{{ __('messages.reader.next_page') }}</button>
+                        <button type="button" data-pdf-command="previous-page" class="btn btn-muted btn-sm">{{ __('messages.reader.previous_page') }}</button>
+                        <button type="button" data-pdf-command="next-page" class="btn btn-muted btn-sm">{{ __('messages.reader.next_page') }}</button>
                         <form data-pdf-page-form class="flex items-center gap-2">
-                            <input data-pdf-page-input type="number" min="1" value="1" aria-label="{{ __('messages.reader.page') }}" class="h-10 w-20 rounded-md border border-slate-200 bg-white px-2 text-sm text-slate-900 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100">
-                            <span class="text-sm font-medium text-slate-600">/ <span data-pdf-total-pages>...</span></span>
+                            <label for="reader-page-input" class="sr-only">{{ __('messages.reader.page') }}</label>
+                            <input id="reader-page-input" data-pdf-page-input type="number" min="1" value="1" aria-label="{{ __('messages.reader.page') }}" class="form-input-sm h-11 w-24">
+                            <span class="text-sm font-bold text-slate-600">/ <span data-pdf-total-pages>...</span></span>
                         </form>
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
-                        <button type="button" data-pdf-command="zoom-out" class="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">{{ __('messages.reader.zoom_out') }}</button>
-                        <button type="button" data-pdf-command="fit-page" class="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">{{ __('messages.reader.fit_width') }}</button>
-                        <button type="button" data-pdf-command="zoom-in" class="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">{{ __('messages.reader.zoom_in') }}</button>
+                        <button type="button" data-pdf-command="zoom-out" class="btn btn-muted btn-sm">{{ __('messages.reader.zoom_out') }}</button>
+                        <button type="button" data-pdf-command="fit-page" class="btn btn-muted btn-sm">{{ __('messages.reader.fit_width') }}</button>
+                        <button type="button" data-pdf-command="zoom-in" class="btn btn-muted btn-sm">{{ __('messages.reader.zoom_in') }}</button>
                     </div>
-                    <form data-pdf-search-form class="flex min-w-0 flex-1 gap-2 lg:max-w-sm">
-                        <input data-pdf-search-input type="search" placeholder="{{ __('messages.reader.search_placeholder') }}" class="h-10 min-w-0 flex-1 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100">
-                        <button class="rounded-md bg-emerald-700 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-800">{{ __('messages.common.search') }}</button>
+                    <form data-pdf-search-form class="flex min-w-0 flex-1 gap-2 xl:max-w-md">
+                        <label for="reader-search-input" class="sr-only">{{ __('messages.reader.search_placeholder') }}</label>
+                        <input id="reader-search-input" data-pdf-search-input type="search" placeholder="{{ __('messages.reader.search_placeholder') }}" class="form-input-sm min-w-0 flex-1">
+                        <button class="btn btn-primary btn-sm">{{ __('messages.common.search') }}</button>
                     </form>
+                    @if($book->download_allowed)
+                        <a href="{{ route('books.download', $book) }}" target="_blank" rel="noopener" class="btn btn-gold btn-sm">{{ __('messages.common.download_pdf') }}</a>
+                    @endif
                 </div>
             </div>
 
-            <div class="relative h-[78vh] min-h-[520px] bg-slate-100 sm:h-[82vh] sm:min-h-[620px]">
+            <div class="relative h-[76dvh] min-h-[460px] bg-slate-100 sm:h-[82dvh] sm:min-h-[640px]">
                 <div data-pdf-loading class="absolute inset-0 z-10 grid place-items-center bg-white/95 px-6 text-center">
                     <div>
-                        <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-emerald-100 border-t-emerald-700"></div>
-                        <p class="mt-4 text-base font-bold text-emerald-950">{{ __('messages.reader.loading') }}</p>
-                        <p class="mt-1 text-sm text-slate-600">{{ __('messages.reader.loading_text') }}</p>
+                        <div class="mx-auto h-11 w-11 animate-spin rounded-full border-4 border-emerald-100 border-t-emerald-800"></div>
+                        <p class="mt-4 text-base font-extrabold text-emerald-950">{{ __('messages.reader.loading') }}</p>
+                        <p class="mt-1 text-sm leading-6 text-slate-600">{{ __('messages.reader.loading_text') }}</p>
                     </div>
                 </div>
 
                 <div data-pdf-error class="hidden absolute inset-0 z-20 grid place-items-center bg-white px-6 text-center">
                     <div class="max-w-md">
-                        <p class="text-xl font-bold text-emerald-950">{{ __('messages.reader.error_title') }}</p>
-                        <p data-pdf-error-message class="mt-2 text-sm leading-6 text-slate-600">{{ __('messages.reader.error_text') }}</p>
+                        <p class="text-2xl font-extrabold text-emerald-950">{{ __('messages.reader.error_title') }}</p>
+                        <p data-pdf-error-message class="mt-3 text-sm leading-7 text-slate-600">{{ __('messages.reader.error_text') }}</p>
                         @if($book->download_allowed)
-                            <a href="{{ route('books.download', $book) }}" target="_blank" rel="noopener" class="mt-5 inline-flex rounded-md bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800">{{ __('messages.common.download_pdf') }}</a>
+                            <a href="{{ route('books.download', $book) }}" target="_blank" rel="noopener" class="btn btn-primary mt-5">{{ __('messages.common.download_pdf') }}</a>
                         @endif
                     </div>
                 </div>
@@ -96,9 +102,10 @@
             </div>
         </div>
     @else
-        <div class="rounded-md border border-amber-200 bg-amber-50 p-6 text-amber-900">
-            <p class="font-bold">{{ __('messages.reader.error_title') }}</p>
-            <p class="mt-2 text-sm leading-6">{{ __('messages.books.pdf_unavailable') }}</p>
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-amber-900">
+            <p class="text-xl font-extrabold">{{ __('messages.reader.error_title') }}</p>
+            <p class="mt-2 text-sm leading-7">{{ __('messages.books.pdf_unavailable') }}</p>
+            <a href="{{ route('books.show', $book) }}" class="btn btn-secondary mt-5">{{ __('messages.reader.back_to_details') }}</a>
         </div>
     @endif
 </section>

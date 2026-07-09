@@ -3,24 +3,35 @@
 @section('title', __('messages.contact_page.title'))
 
 @section('content')
-<section class="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-    <p class="section-kicker">{{ __('messages.contact_page.title') }}</p>
-    <h1 class="section-heading">{{ __('messages.contact_page.heading') }}</h1>
-    <div class="mt-8 grid gap-5 md:grid-cols-2">
-        <div class="rounded-md border border-emerald-100 bg-white p-6 shadow-sm">
-            <h2 class="text-xl font-bold text-emerald-950">{{ $settings['madrasa_name'] ?? __('messages.meta.site_name') }}</h2>
-            <div class="mt-5 space-y-3 text-stone-700">
-                @if(! empty($settings['contact_number'])) <p><strong>{{ __('messages.contact_page.phone') }}:</strong> {{ $settings['contact_number'] }}</p> @endif
-                @if(! empty($settings['whatsapp_number'])) <p><strong>{{ __('messages.contact_page.whatsapp') }}:</strong> {{ $settings['whatsapp_number'] }}</p> @endif
-                @if(! empty($settings['email'])) <p><strong>{{ __('messages.contact_page.email') }}:</strong> {{ $settings['email'] }}</p> @endif
-                @if(! empty($settings['address'])) <p><strong>{{ __('messages.contact_page.address') }}:</strong> {{ $settings['address'] }}</p> @endif
+<section class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="mb-8 max-w-3xl">
+        <p class="section-kicker">{{ __('messages.contact_page.title') }}</p>
+        <h1 class="section-heading">{{ __('messages.contact_page.heading') }}</h1>
+        <p class="section-copy">{{ __('messages.contact_page.requests_text') }}</p>
+    </div>
+    <div class="grid gap-6 md:grid-cols-[1fr_0.9fr]">
+        <div class="surface-card p-6 sm:p-8">
+            <h2 class="text-2xl font-extrabold text-emerald-950">{{ $settings['madrasa_name'] ?? __('messages.meta.site_name') }}</h2>
+            <div class="mt-6 grid gap-3 text-stone-700">
+                @if(! empty($settings['contact_number']))
+                    <p class="rounded-xl bg-emerald-50 px-4 py-3"><strong>{{ __('messages.contact_page.phone') }}:</strong> {{ $settings['contact_number'] }}</p>
+                @endif
+                @if(! empty($settings['whatsapp_number']))
+                    <p class="rounded-xl bg-emerald-50 px-4 py-3"><strong>{{ __('messages.contact_page.whatsapp') }}:</strong> {{ $settings['whatsapp_number'] }}</p>
+                @endif
+                @if(! empty($settings['email']))
+                    <p class="rounded-xl bg-emerald-50 px-4 py-3"><strong>{{ __('messages.contact_page.email') }}:</strong> {{ $settings['email'] }}</p>
+                @endif
+                @if(! empty($settings['address']))
+                    <p class="rounded-xl bg-emerald-50 px-4 py-3"><strong>{{ __('messages.contact_page.address') }}:</strong> {{ $settings['address'] }}</p>
+                @endif
             </div>
         </div>
-        <div class="rounded-md border border-emerald-100 bg-emerald-50 p-6">
-            <h2 class="text-xl font-bold text-emerald-950">{{ __('messages.contact_page.requests_title') }}</h2>
-            <p class="mt-3 leading-7 text-stone-700">{{ __('messages.contact_page.requests_text') }}</p>
+        <div class="islamic-pattern rounded-3xl p-6 text-white shadow-2xl shadow-emerald-950/10 sm:p-8">
+            <h2 class="text-2xl font-extrabold">{{ __('messages.contact_page.requests_title') }}</h2>
+            <p class="mt-4 leading-8 text-emerald-50/90">{{ __('messages.contact_page.requests_text') }}</p>
             @if(! empty($settings['whatsapp_number']))
-                <a href="https://wa.me/{{ preg_replace('/\D+/', '', $settings['whatsapp_number']) }}" class="mt-5 inline-flex rounded-md bg-emerald-700 px-4 py-2 font-semibold text-white hover:bg-emerald-800">{{ __('messages.contact_page.open_whatsapp') }}</a>
+                <a href="https://wa.me/{{ preg_replace('/\D+/', '', $settings['whatsapp_number']) }}" class="btn btn-gold mt-6" target="_blank" rel="noopener">{{ __('messages.contact_page.open_whatsapp') }}</a>
             @endif
         </div>
     </div>
