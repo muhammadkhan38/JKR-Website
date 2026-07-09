@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PDF Reader</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --surface: #f8fafc;
+            --page: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #dbe4ec;
+            --accent: #047857;
+        }
+
+        * {
+            box-sizing: border-box;
+            letter-spacing: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            background: var(--surface);
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            line-height: 1.6;
+        }
+
+        .status {
+            display: grid;
+            min-height: 100%;
+            place-items: center;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .status-card {
+            max-width: 520px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: var(--page);
+            padding: 24px;
+            box-shadow: 0 20px 40px rgb(15 23 42 / 0.08);
+        }
+
+        .status-title {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .status-text {
+            margin: 10px 0 0;
+            color: var(--muted);
+            font-size: 16px;
+        }
+
+        #viewer {
+            width: 100%;
+            min-height: 100%;
+            padding: 18px 10px 48px;
+        }
+
+        .page {
+            width: fit-content;
+            min-height: 320px;
+            margin: 0 auto 18px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--page);
+            box-shadow: 0 10px 28px rgb(15 23 42 / 0.12);
+        }
+
+        canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="status">
+        <div class="status-card">
+            <p class="status-title">Loading PDF</p>
+            <p class="status-text">Please wait while the book is prepared for reading.</p>
+        </div>
+    </div>
+    <main id="viewer" hidden></main>
+
+    <script type="module">
+        import * as pdfjsLib from '../build/pdf.min.mjs';
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '../build/pdf.worker.min.mjs';
+
+        const params = new URLSearchParams(window.location.search);
+        const file = params.get('file');
+        const initialPage = Math.max(1, Number.parseInt(params.get('page') || '1', 10) || 1);
+        const loading = document.getElementById('loading');
+        const viewer = document.getElementById('viewer');
+        const pageViews = new Map();
+        let pdf = null;
+        let scale = 1.18;
+        let fitWidth = true;
+        let currentPage = initialPage;
+        let renderedPages = new Set();
+        let observer = null;
+
+        const post = (payload) => window.parent?.postMessage({ source: 'madrassa-pdfjs', ...payload }, window.location.origin);
+
+        const showError = (message) => {
+            loading.hidden = false;
+            viewer.hidden = true;
+            loading.innerHTML = `<div class="status-card"><p class="status-title">PDF unavailable</p><p class="status-text">${message}</p></div>`;
+            post({ type: 'error', message });
+        };
+
+        const pageScale = async (page) => {
+            if (!fitWidth) {
+                return scale;
+            }
+
+            const viewport = page.getViewport({ scale: 1 });
+            const availableWidth = Math.max(280, viewer.clientWidth - 28);
+
+            return Math.min(2.4, Math.max(0.72, availableWidth / viewport.width));
+        };
+
+        const renderPage = async (pageNumber, force = false) => {
+            if (!pdf || (!force && renderedPages.has(pageNumber))) {
+                return;
+            }
+
+            const pageShell = pageViews.get(pageNumber);
+            if (!pageShell) {
+                return;
+            }
+
+            const page = await pdf.getPage(pageNumber);
+            const finalScale = fitWidth ? await pageScale(page) : scale;
+            const viewport = page.getViewport({ scale: finalScale });
+            const canvas = pageShell.querySelector('canvas');
+            const context = canvas.getContext('2d', { alpha: false });
+            const deviceScale = window.devicePixelRatio || 1;
+
+            canvas.width = Math.floor(viewport.width * deviceScale);
+            canvas.height = Math.floor(viewport.height * deviceScale);
+            canvas.style.width = `${Math.floor(viewport.width)}px`;
+            canvas.style.height = `${Math.floor(viewport.height)}px`;
+            context.setTransform(deviceScale, 0, 0, deviceScale, 0, 0);
+
+            await page.render({ canvasContext: context, viewport }).promise;
+            renderedPages.add(pageNumber);
+        };
+
+        const rerenderVisiblePages = async () => {
+            renderedPages = new Set();
+            const visiblePages = [...pageViews.entries()]
+                .filter(([, element]) => {
+                    const rect = element.getBoundingClientRect();
+                    return rect.bottom >= -400 && rect.top <= window.innerHeight + 400;
+                })
+                .map(([pageNumber]) => pageNumber);
+
+            await Promise.all(visiblePages.map((pageNumber) => renderPage(pageNumber, true)));
+        };
+
+        const goToPage = async (pageNumber) => {
+            if (!pdf) {
+                return;
+            }
+
+            const target = Math.min(pdf.numPages, Math.max(1, Number.parseInt(pageNumber, 10) || 1));
+            await renderPage(target);
+            pageViews.get(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            currentPage = target;
+            post({ type: 'page-change', page: currentPage, pages: pdf.numPages });
+        };
+
+        const setupObservers = () => {
+            observer?.disconnect();
+            observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    const pageNumber = Number(entry.target.dataset.pageNumber);
+
+                    if (entry.isIntersecting) {
+                        renderPage(pageNumber);
+
+                        if (entry.intersectionRatio > 0.35) {
+                            currentPage = pageNumber;
+                            post({ type: 'page-change', page: currentPage, pages: pdf.numPages });
+                        }
+                    }
+                });
+            }, { root: null, rootMargin: '700px 0px', threshold: [0.1, 0.35, 0.7] });
+
+            pageViews.forEach((element) => observer.observe(element));
+        };
+
+        const findText = async (query) => {
+            if (!pdf || !query.trim()) {
+                return;
+            }
+
+            const needle = query.trim().toLocaleLowerCase();
+            const pages = [
+                ...Array.from({ length: pdf.numPages - currentPage + 1 }, (_, index) => currentPage + index),
+                ...Array.from({ length: currentPage - 1 }, (_, index) => index + 1),
+            ];
+
+            for (const pageNumber of pages) {
+                const page = await pdf.getPage(pageNumber);
+                const content = await page.getTextContent();
+                const text = content.items.map((item) => item.str).join(' ').toLocaleLowerCase();
+
+                if (text.includes(needle)) {
+                    await goToPage(pageNumber);
+                    post({ type: 'search-result', page: pageNumber });
+
+                    return;
+                }
+            }
+
+            post({ type: 'search-empty' });
+        };
+
+        window.addEventListener('message', async (event) => {
+            if (event.origin !== window.location.origin || event.data?.target !== 'madrassa-pdfjs') {
+                return;
+            }
+
+            const { command, value } = event.data;
+
+            if (command === 'zoom-in') {
+                fitWidth = false;
+                scale = Math.min(3, scale + 0.15);
+                await rerenderVisiblePages();
+            }
+
+            if (command === 'zoom-out') {
+                fitWidth = false;
+                scale = Math.max(0.6, scale - 0.15);
+                await rerenderVisiblePages();
+            }
+
+            if (command === 'fit-width') {
+                fitWidth = true;
+                await rerenderVisiblePages();
+            }
+
+            if (command === 'go-to-page') {
+                await goToPage(value);
+            }
+
+            if (command === 'next-page') {
+                await goToPage(currentPage + 1);
+            }
+
+            if (command === 'previous-page') {
+                await goToPage(currentPage - 1);
+            }
+
+            if (command === 'search') {
+                await findText(String(value || ''));
+            }
+        });
+
+        const load = async () => {
+            if (!file) {
+                showError('No PDF file was provided.');
+
+                return;
+            }
+
+            try {
+                pdf = await pdfjsLib.getDocument({ url: file }).promise;
+                viewer.hidden = false;
+                loading.hidden = true;
+
+                for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+                    const pageShell = document.createElement('section');
+                    pageShell.className = 'page';
+                    pageShell.dataset.pageNumber = String(pageNumber);
+                    pageShell.setAttribute('aria-label', `Page ${pageNumber}`);
+                    pageShell.innerHTML = '<canvas></canvas>';
+                    viewer.appendChild(pageShell);
+                    pageViews.set(pageNumber, pageShell);
+                }
+
+                setupObservers();
+                await goToPage(initialPage);
+                post({ type: 'loaded', page: currentPage, pages: pdf.numPages });
+            } catch (error) {
+                showError('The PDF could not be loaded. Please try the download option or contact the madrassa office.');
+            }
+        };
+
+        window.addEventListener('resize', () => {
+            if (fitWidth) {
+                window.clearTimeout(window.__pdfResizeTimer);
+                window.__pdfResizeTimer = window.setTimeout(rerenderVisiblePages, 180);
+            }
+        });
+
+        load();
+    </script>
+</body>
+</html>
