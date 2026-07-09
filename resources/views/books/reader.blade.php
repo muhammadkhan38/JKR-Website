@@ -60,6 +60,7 @@
                         <button type="button" data-pdf-command="zoom-out" class="btn btn-muted btn-sm">{{ __('messages.reader.zoom_out') }}</button>
                         <button type="button" data-pdf-command="fit-page" class="btn btn-muted btn-sm">{{ __('messages.reader.fit_width') }}</button>
                         <button type="button" data-pdf-command="zoom-in" class="btn btn-muted btn-sm">{{ __('messages.reader.zoom_in') }}</button>
+                        <button type="button" data-reader-fullscreen class="btn btn-muted btn-sm">{{ __('messages.reader.fullscreen') }}</button>
                     </div>
                     <form data-pdf-search-form class="flex min-w-0 flex-1 gap-2 xl:max-w-md">
                         <label for="reader-search-input" class="sr-only">{{ __('messages.reader.search_placeholder') }}</label>
@@ -72,7 +73,16 @@
                 </div>
             </div>
 
-            <div class="relative h-[76dvh] min-h-[460px] bg-slate-100 sm:h-[82dvh] sm:min-h-[640px]">
+            <div class="border-b border-slate-200 bg-white px-3 py-3 {{ $startsWithPdfJs ? 'hidden' : '' }}" data-native-reader-actions>
+                <div class="flex flex-wrap items-center justify-end gap-2">
+                    <button type="button" data-reader-fullscreen class="btn btn-muted btn-sm">{{ __('messages.reader.fullscreen') }}</button>
+                    @if($book->download_allowed)
+                        <a href="{{ route('books.download', $book) }}" target="_blank" rel="noopener" class="btn btn-gold btn-sm">{{ __('messages.common.download_pdf') }}</a>
+                    @endif
+                </div>
+            </div>
+
+            <div data-pdf-viewport class="relative h-[76dvh] min-h-[460px] bg-slate-100 sm:h-[82dvh] sm:min-h-[640px]">
                 <div data-pdf-loading class="absolute inset-0 z-10 grid place-items-center bg-white/95 px-6 text-center">
                     <div>
                         <div class="mx-auto h-11 w-11 animate-spin rounded-full border-4 border-emerald-100 border-t-emerald-800"></div>
@@ -124,6 +134,7 @@
             const error = reader.querySelector('[data-pdf-error]');
             const errorMessage = reader.querySelector('[data-pdf-error-message]');
             const toolbar = reader.querySelector('[data-pdfjs-toolbar]');
+            const nativeReaderActions = reader.querySelector('[data-native-reader-actions]');
             const pageInput = reader.querySelector('[data-pdf-page-input]');
             const totalPages = reader.querySelector('[data-pdf-total-pages]');
             const fallbackUrl = reader.dataset.fallbackUrl;
@@ -158,6 +169,7 @@
                 showLoading();
                 hideError();
                 toolbar?.classList.remove('hidden');
+                nativeReaderActions?.classList.add('hidden');
                 frame.src = fallbackUrl;
             };
             const switchToNativePreview = () => {
@@ -170,6 +182,7 @@
                 showLoading();
                 hideError();
                 toolbar?.classList.add('hidden');
+                nativeReaderActions?.classList.remove('hidden');
                 frame.src = nativeUrl;
             };
             const switchToDrivePreview = () => {
@@ -182,6 +195,7 @@
                 showLoading();
                 hideError();
                 toolbar?.classList.add('hidden');
+                nativeReaderActions?.classList.remove('hidden');
                 frame.src = drivePreviewUrl;
             };
             const sendPdfCommand = (command, value = null) => {
@@ -226,6 +240,18 @@
                 button.addEventListener('click', () => sendPdfCommand(button.dataset.pdfCommand));
             });
 
+            reader.querySelectorAll('[data-reader-fullscreen]').forEach((button) => {
+                button.addEventListener('click', async () => {
+                    if (document.fullscreenElement) {
+                        await document.exitFullscreen();
+
+                        return;
+                    }
+
+                    await reader.requestFullscreen?.();
+                });
+            });
+
             reader.querySelector('[data-pdf-page-form]')?.addEventListener('submit', (event) => {
                 event.preventDefault();
                 sendPdfCommand('go-to-page', pageInput?.value || 1);
@@ -245,6 +271,7 @@
                     hideLoading();
                     hideError();
                     toolbar?.classList.remove('hidden');
+                    nativeReaderActions?.classList.add('hidden');
                     updatePage(event.data.page, event.data.pages);
                 }
 

@@ -3,7 +3,7 @@
 @section('title', ($settings['madrasa_name'] ?? __('messages.meta.site_name')).' - '.__('messages.home.title_suffix'))
 
 @section('content')
-<section class="islamic-pattern text-white">
+<section id="about" class="islamic-pattern scroll-mt-24 text-white">
     <div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-20">
         <div class="self-center">
             <p class="text-sm font-extrabold uppercase text-amber-200">{{ __('messages.home.kicker') }}</p>
@@ -42,7 +42,7 @@
         </div>
         <a href="{{ route('books.index', ['latest' => 1]) }}" class="btn btn-secondary btn-sm">{{ __('messages.common.view_all') }}</a>
     </div>
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         @forelse($latestBooks as $book)
             @include('partials.book-card', ['book' => $book])
         @empty
@@ -51,14 +51,33 @@
     </div>
 </section>
 
-@if($featuredBooks->isNotEmpty())
+@if($popularBooks->isNotEmpty())
 <section class="bg-white/70">
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div class="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <p class="section-kicker">{{ __('messages.home.popular_kicker') }}</p>
+                <h2 class="section-heading">{{ __('messages.common.popular_books') }}</h2>
+            </div>
+            <a href="{{ route('books.index') }}" class="btn btn-secondary btn-sm">{{ __('messages.common.view_all') }}</a>
+        </div>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            @foreach($popularBooks as $book)
+                @include('partials.book-card', ['book' => $book])
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+@if($featuredBooks->isNotEmpty())
+<section>
     <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div class="mb-7">
             <p class="section-kicker">{{ __('messages.home.madrasa_picks') }}</p>
             <h2 class="section-heading">{{ __('messages.common.featured_books') }}</h2>
         </div>
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             @foreach($featuredBooks as $book)
                 @include('partials.book-card', ['book' => $book])
             @endforeach
@@ -102,7 +121,7 @@
 </section>
 @endif
 
-<section class="bg-white/70">
+<section id="categories" class="scroll-mt-24 bg-white/70">
     <div class="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
         <div>
             <p class="section-kicker">{{ __('messages.home.browse_kicker') }}</p>

@@ -44,6 +44,8 @@
                     <div class="flex flex-col gap-2 md:flex-row md:items-center md:gap-1">
                         <a class="nav-link" href="{{ route('home') }}">{{ __('messages.nav.home') }}</a>
                         <a class="nav-link" href="{{ route('books.index') }}">{{ __('messages.nav.books') }}</a>
+                        <a class="nav-link" href="{{ route('home') }}#categories">{{ __('messages.nav.categories') }}</a>
+                        <a class="nav-link" href="{{ route('home') }}#about">{{ __('messages.nav.about') }}</a>
                         <a class="nav-link" href="{{ route('audios.index') }}">{{ __('messages.nav.audios') }}</a>
                         <a class="nav-link" href="{{ route('contact') }}">{{ __('messages.nav.contact') }}</a>
                         @auth

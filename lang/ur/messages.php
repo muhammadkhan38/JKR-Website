@@ -13,6 +13,8 @@ return [
         'urdu' => 'اردو',
     ],
     'nav' => [
+        'categories' => 'Categories',
+        'about' => 'About',
         'home' => 'صفحہ اول',
         'books' => 'کتب',
         'audios' => 'آڈیو',
@@ -36,6 +38,7 @@ return [
         'default_text' => 'اللہ تعالیٰ اس علم کو قبول فرمائے اور نفع بخش بنائے۔',
     ],
     'common' => [
+        'popular_books' => 'Popular Books',
         'whatsapp_short' => 'WA',
         'search' => 'تلاش',
         'filter' => 'فلٹر',
@@ -67,6 +70,7 @@ return [
         'separator' => '، ',
     ],
     'home' => [
+        'popular_kicker' => 'Most Saved',
         'title_suffix' => 'صفحہ اول',
         'kicker' => 'اسلامی کتب کی لائبریری',
         'default_intro' => 'مدرسہ کی منتخب اسلامی کتب پڑھیں، ڈاؤن لوڈ کریں، محفوظ کریں اور متعلقہ اسباق سنیں۔',
@@ -115,6 +119,7 @@ return [
         'event_empty' => 'اس مجموعے کے ساتھ ابھی کوئی کتاب منسلک نہیں۔',
     ],
     'reader' => [
+        'fullscreen' => 'Fullscreen',
         'title_suffix' => 'کا مطالعہ',
         'kicker' => 'آن لائن ریڈر',
         'back_to_details' => 'تفصیل پر واپس جائیں',

@@ -8,7 +8,7 @@
         <p class="section-kicker">{{ __('messages.bookmarks.kicker') }}</p>
         <h1 class="section-heading">{{ __('messages.bookmarks.heading') }}</h1>
     </div>
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         @forelse($books as $book)
             @include('partials.book-card', ['book' => $book])
         @empty
