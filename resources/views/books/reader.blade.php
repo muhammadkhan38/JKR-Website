@@ -5,8 +5,9 @@
 @section('content')
 @php
     $hasPdf = filled($pdf);
-    $startsWithPdfJs = $hasPdf && ! $pdf['is_google_drive'];
-    $primaryPreviewUrl = $hasPdf ? ($pdf['is_google_drive'] ? $pdf['preview_url'] : $pdfJsUrl) : null;
+    $startsWithPdfJs = $hasPdf;
+    $primaryPreviewUrl = $hasPdf ? $pdfJsUrl : null;
+    $drivePreviewUrl = $hasPdf && $pdf['is_google_drive'] ? $pdf['preview_url'] : null;
 @endphp
 
 <section class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -17,8 +18,8 @@
         </div>
         <div class="flex flex-wrap gap-2">
             <a href="{{ route('books.index') }}" class="rounded-md border border-emerald-200 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-50">{{ __('messages.reader.back_to_books') }}</a>
-            @if($hasPdf && $pdf['is_google_drive'])
-                <button type="button" data-use-pdfjs class="rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">{{ __('messages.reader.fallback_reader') }}</button>
+            @if($drivePreviewUrl)
+                <button type="button" data-use-drive-preview class="rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">{{ __('messages.reader.drive_preview') }}</button>
             @endif
             @if($hasPdf && $book->download_allowed)
                 <a href="{{ route('books.download', $book) }}" target="_blank" rel="noopener" class="rounded-md bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800">{{ __('messages.common.download_pdf') }}</a>
@@ -34,6 +35,7 @@
         <div
             data-pdf-reader
             data-fallback-url="{{ $pdfJsUrl }}"
+            data-drive-preview-url="{{ $drivePreviewUrl }}"
             data-starts-pdfjs="{{ $startsWithPdfJs ? 1 : 0 }}"
             class="overflow-hidden rounded-md border border-emerald-100 bg-white shadow-sm"
         >
@@ -49,7 +51,7 @@
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
                         <button type="button" data-pdf-command="zoom-out" class="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">{{ __('messages.reader.zoom_out') }}</button>
-                        <button type="button" data-pdf-command="fit-width" class="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">{{ __('messages.reader.fit_width') }}</button>
+                        <button type="button" data-pdf-command="fit-page" class="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">{{ __('messages.reader.fit_width') }}</button>
                         <button type="button" data-pdf-command="zoom-in" class="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">{{ __('messages.reader.zoom_in') }}</button>
                     </div>
                     <form data-pdf-search-form class="flex min-w-0 flex-1 gap-2 lg:max-w-sm">
@@ -113,6 +115,7 @@
             const pageInput = reader.querySelector('[data-pdf-page-input]');
             const totalPages = reader.querySelector('[data-pdf-total-pages]');
             const fallbackUrl = reader.dataset.fallbackUrl;
+            const drivePreviewUrl = reader.dataset.drivePreviewUrl;
             let usingPdfJs = reader.dataset.startsPdfjs === '1';
             let primaryLoaded = false;
 
@@ -143,6 +146,18 @@
                 hideError();
                 toolbar?.classList.remove('hidden');
                 frame.src = fallbackUrl;
+            };
+            const switchToDrivePreview = () => {
+                if (! drivePreviewUrl || ! usingPdfJs) {
+                    return;
+                }
+
+                usingPdfJs = false;
+                primaryLoaded = false;
+                showLoading();
+                hideError();
+                toolbar?.classList.add('hidden');
+                frame.src = drivePreviewUrl;
             };
             const sendPdfCommand = (command, value = null) => {
                 const wasUsingPdfJs = usingPdfJs;
@@ -184,6 +199,10 @@
 
             document.querySelectorAll('[data-use-pdfjs]').forEach((button) => {
                 button.addEventListener('click', switchToPdfJs);
+            });
+
+            document.querySelectorAll('[data-use-drive-preview]').forEach((button) => {
+                button.addEventListener('click', switchToDrivePreview);
             });
 
             reader.querySelectorAll('[data-pdf-command]').forEach((button) => {

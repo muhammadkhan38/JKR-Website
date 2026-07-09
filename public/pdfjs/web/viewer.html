@@ -108,7 +108,7 @@
         const pageViews = new Map();
         let pdf = null;
         let scale = 1.18;
-        let fitWidth = true;
+        let fitMode = 'page';
         let currentPage = initialPage;
         let renderedPages = new Set();
         let observer = null;
@@ -123,14 +123,19 @@
         };
 
         const pageScale = async (page) => {
-            if (!fitWidth) {
+            if (fitMode === 'manual') {
                 return scale;
             }
 
             const viewport = page.getViewport({ scale: 1 });
             const availableWidth = Math.max(280, viewer.clientWidth - 28);
+            const availableHeight = Math.max(320, window.innerHeight - 100);
 
-            return Math.min(2.4, Math.max(0.72, availableWidth / viewport.width));
+            if (fitMode === 'width') {
+                return Math.min(2.4, Math.max(0.25, availableWidth / viewport.width));
+            }
+
+            return Math.min(2.4, Math.max(0.25, Math.min(availableWidth / viewport.width, availableHeight / viewport.height)));
         };
 
         const renderPage = async (pageNumber, force = false) => {
@@ -144,7 +149,7 @@
             }
 
             const page = await pdf.getPage(pageNumber);
-            const finalScale = fitWidth ? await pageScale(page) : scale;
+            const finalScale = fitMode === 'manual' ? scale : await pageScale(page);
             const viewport = page.getViewport({ scale: finalScale });
             const canvas = pageShell.querySelector('canvas');
             const context = canvas.getContext('2d', { alpha: false });
@@ -239,19 +244,24 @@
             const { command, value } = event.data;
 
             if (command === 'zoom-in') {
-                fitWidth = false;
+                fitMode = 'manual';
                 scale = Math.min(3, scale + 0.15);
                 await rerenderVisiblePages();
             }
 
             if (command === 'zoom-out') {
-                fitWidth = false;
+                fitMode = 'manual';
                 scale = Math.max(0.6, scale - 0.15);
                 await rerenderVisiblePages();
             }
 
+            if (command === 'fit-page') {
+                fitMode = 'page';
+                await rerenderVisiblePages();
+            }
+
             if (command === 'fit-width') {
-                fitWidth = true;
+                fitMode = 'width';
                 await rerenderVisiblePages();
             }
 
@@ -303,7 +313,7 @@
         };
 
         window.addEventListener('resize', () => {
-            if (fitWidth) {
+            if (fitMode !== 'manual') {
                 window.clearTimeout(window.__pdfResizeTimer);
                 window.__pdfResizeTimer = window.setTimeout(rerenderVisiblePages, 180);
             }
