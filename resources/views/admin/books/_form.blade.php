@@ -84,6 +84,19 @@
         <input class="form-input" id="pdf_file_ur" type="file" name="pdf_file_ur" accept=".pdf" data-file-label="#pdf-ur-file-name">
         <p id="pdf-ur-file-name" class="mt-2 text-sm text-slate-500">{{ $book->pdf_file_ur ? __('messages.common.current_file', ['file' => $book->pdf_file_ur]) : '' }}</p>
     </div>
+    <div>
+        <label class="form-label" for="external_pdf_url">{{ __('messages.admin.fields.external_pdf_url') }}</label>
+        <input class="form-input" id="external_pdf_url" type="url" name="external_pdf_url" value="{{ old('external_pdf_url', $book->external_pdf_url) }}" placeholder="{{ __('messages.admin.books.external_pdf_placeholder') }}">
+        <p class="mt-2 text-sm text-slate-500">{{ __('messages.admin.books.external_pdf_hint') }}</p>
+    </div>
+    <div>
+        <label class="form-label" for="external_pdf_url_en">{{ __('messages.admin.fields.external_pdf_url_en') }}</label>
+        <input class="form-input" id="external_pdf_url_en" type="url" name="external_pdf_url_en" value="{{ old('external_pdf_url_en', $book->external_pdf_url_en) }}" placeholder="{{ __('messages.admin.books.external_pdf_placeholder') }}">
+    </div>
+    <div>
+        <label class="form-label" for="external_pdf_url_ur">{{ __('messages.admin.fields.external_pdf_url_ur') }}</label>
+        <input class="form-input" id="external_pdf_url_ur" type="url" name="external_pdf_url_ur" value="{{ old('external_pdf_url_ur', $book->external_pdf_url_ur) }}" placeholder="{{ __('messages.admin.books.external_pdf_placeholder') }}">
+    </div>
 </div>
 <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
     @foreach([

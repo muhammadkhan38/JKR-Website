@@ -22,7 +22,10 @@
             <p class="mt-3 line-clamp-3 text-sm leading-6 text-stone-700">{{ $summary }}</p>
         @endif
         <div class="mt-auto flex flex-wrap gap-2 pt-5">
-            <a href="{{ route('books.reader', $book) }}" class="rounded-md bg-emerald-700 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-800">{{ __('messages.common.read') }}</a>
+            <a href="{{ route('books.reader', $book) }}" class="rounded-md bg-emerald-700 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-800">{{ __('messages.common.read_online') }}</a>
+            @if($book->download_allowed && $book->localized_pdf_url)
+                <a href="{{ route('books.download', $book) }}" target="_blank" rel="noopener" class="rounded-md border border-emerald-200 px-3 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-50">{{ __('messages.common.download_pdf') }}</a>
+            @endif
             <a href="{{ route('books.show', $book) }}" class="rounded-md border border-emerald-200 px-3 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-50">{{ __('messages.common.details') }}</a>
             @auth
                 <button type="button"

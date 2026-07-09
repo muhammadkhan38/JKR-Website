@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Author;
 use App\Models\Book;
 use App\Models\Category;
+use App\Support\GoogleDrivePdf;
 use App\Support\LocalizedColumns;
 use App\Support\Slug;
 use Illuminate\Http\RedirectResponse;
@@ -118,10 +119,27 @@ class BookController extends Controller
             'description_en' => ['nullable', 'string'],
             'description_ur' => ['nullable', 'string'],
             'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'pdf_file' => [$requirePdf ? 'required_without_all:pdf_file_en,pdf_file_ur' : 'nullable', 'file', 'mimes:pdf', 'max:20480'],
+            'pdf_file' => [$requirePdf ? 'required_without_all:pdf_file_en,pdf_file_ur,external_pdf_url,external_pdf_url_en,external_pdf_url_ur' : 'nullable', 'file', 'mimes:pdf', 'max:20480'],
             'pdf_file_en' => ['nullable', 'file', 'mimes:pdf', 'max:20480'],
             'pdf_file_ur' => ['nullable', 'file', 'mimes:pdf', 'max:20480'],
+            'external_pdf_url' => $this->externalPdfUrlRules(),
+            'external_pdf_url_en' => $this->externalPdfUrlRules(),
+            'external_pdf_url_ur' => $this->externalPdfUrlRules(),
         ]);
+    }
+
+    private function externalPdfUrlRules(): array
+    {
+        return [
+            'nullable',
+            'url',
+            'max:2048',
+            function (string $attribute, mixed $value, \Closure $fail): void {
+                if ($value && ! GoogleDrivePdf::isSupportedPdfUrl($value)) {
+                    $fail(__('messages.books.invalid_pdf_link'));
+                }
+            },
+        ];
     }
 
     private function setLegacyFields(array &$data): void

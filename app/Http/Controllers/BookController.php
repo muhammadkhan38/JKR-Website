@@ -5,15 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Author;
 use App\Models\Book;
 use App\Models\Category;
+use App\Support\BookPdfResolver;
 use App\Support\LocalizedColumns;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Client\Response as ClientResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Throwable;
 
 class BookController extends Controller
 {
+    public function __construct(private readonly BookPdfResolver $pdfs) {}
+
     public function index(Request $request): View
     {
         $books = Book::active()
@@ -78,31 +83,110 @@ class BookController extends Controller
     {
         abort_unless($book->is_active, 404);
 
-        return view('books.reader', compact('book'));
+        $pdf = $this->pdfs->resolve($book);
+        $pdfJsUrl = $pdf
+            ? asset('pdfjs/web/viewer.html').'?file='.rawurlencode(route('books.pdf', $book))
+            : null;
+
+        return view('books.reader', compact('book', 'pdf', 'pdfJsUrl'));
     }
 
-    public function download(Book $book): RedirectResponse|StreamedResponse
+    public function pdf(Book $book): SymfonyResponse
+    {
+        abort_unless($book->is_active, 404);
+
+        $pdf = $this->pdfs->resolve($book);
+
+        abort_unless($pdf, 404);
+
+        if ($pdf['type'] === 'local') {
+            return Storage::disk('public')->response($pdf['path'], $pdf['file_name'], [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="'.$pdf['file_name'].'"',
+                'X-Content-Type-Options' => 'nosniff',
+            ]);
+        }
+
+        $response = $this->streamExternalPdf($pdf['download_url'], $pdf['file_name'], false);
+
+        abort_unless($response, 422, __('messages.reader.error_text'));
+
+        return $response;
+    }
+
+    public function download(Book $book): SymfonyResponse
     {
         abort_unless($book->is_active && $book->download_allowed, 403);
 
-        $pdfSource = $book->localizedPdfSource();
+        $pdf = $this->pdfs->resolve($book);
 
-        if (($pdfSource['type'] ?? null) === 'external') {
-            return redirect()->away($pdfSource['value']);
-        }
-
-        $pdfPath = ($pdfSource['type'] ?? null) === 'local' ? $pdfSource['value'] : null;
-
-        if (! $pdfPath || ! Storage::disk('public')->exists($pdfPath)) {
-            $externalPdfUrl = $book->localizedExternalPdfUrl();
-
-            if ($externalPdfUrl) {
-                return redirect()->away($externalPdfUrl);
-            }
-
+        if (! $pdf) {
             return back()->with('error', __('messages.books.download_unavailable'));
         }
 
-        return Storage::disk('public')->download($pdfPath, $book->slug.'.pdf');
+        if ($pdf['type'] === 'local') {
+            return Storage::disk('public')->download($pdf['path'], $pdf['file_name'], [
+                'Content-Type' => 'application/pdf',
+            ]);
+        }
+
+        $response = $this->streamExternalPdf($pdf['download_url'], $pdf['file_name'], true);
+
+        return $response ?: redirect()->away($pdf['download_url']);
+    }
+
+    private function streamExternalPdf(string $url, string $fileName, bool $download): ?SymfonyResponse
+    {
+        try {
+            $response = Http::withHeaders([
+                'Accept' => 'application/pdf,application/octet-stream;q=0.9,*/*;q=0.8',
+                'User-Agent' => config('app.name', 'Madrasa Library').' PDF Reader',
+            ])
+                ->connectTimeout(10)
+                ->timeout(60)
+                ->withOptions(['stream' => true])
+                ->get($url);
+        } catch (Throwable) {
+            return null;
+        }
+
+        if (! $response->successful() || ! $this->responseLooksLikePdf($response, $url)) {
+            return null;
+        }
+
+        $body = $response->toPsrResponse()->getBody();
+        $disposition = $download ? 'attachment' : 'inline';
+        $headers = [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => $disposition.'; filename="'.$fileName.'"',
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'private, max-age=3600',
+        ];
+
+        if (is_numeric($response->header('Content-Length'))) {
+            $headers['Content-Length'] = $response->header('Content-Length');
+        }
+
+        return response()->stream(function () use ($body): void {
+            while (! $body->eof()) {
+                echo $body->read(1024 * 1024);
+
+                if (ob_get_level() > 0) {
+                    ob_flush();
+                }
+
+                flush();
+            }
+        }, 200, $headers);
+    }
+
+    private function responseLooksLikePdf(ClientResponse $response, string $url): bool
+    {
+        $contentType = strtolower((string) $response->header('Content-Type'));
+        $path = strtolower(rawurldecode(parse_url($url, PHP_URL_PATH) ?? ''));
+
+        return str_contains($contentType, 'pdf')
+            || str_contains($contentType, 'octet-stream')
+            || str_ends_with($path, '.pdf');
     }
 }

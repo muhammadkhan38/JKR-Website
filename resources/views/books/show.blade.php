@@ -29,8 +29,8 @@
             @endif
             <div class="mt-6 flex flex-wrap gap-3">
                 <a href="{{ route('books.reader', $book) }}" class="rounded-md bg-emerald-700 px-5 py-3 font-semibold text-white hover:bg-emerald-800">{{ __('messages.common.read_online') }}</a>
-                @if($book->download_allowed)
-                    <a href="{{ route('books.download', $book) }}" class="rounded-md border border-emerald-200 px-5 py-3 font-semibold text-emerald-800 hover:bg-emerald-50">{{ __('messages.common.download_pdf') }}</a>
+                @if($book->download_allowed && $book->localized_pdf_url)
+                    <a href="{{ route('books.download', $book) }}" target="_blank" rel="noopener" class="rounded-md border border-emerald-200 px-5 py-3 font-semibold text-emerald-800 hover:bg-emerald-50">{{ __('messages.common.download_pdf') }}</a>
                 @endif
                 @auth
                     @php($isBookmarked = auth()->user()->bookmarks()->where('book_id', $book->id)->exists())

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasLocalizedFields;
+use App\Support\GoogleDrivePdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -38,6 +39,8 @@ class Book extends Model
         'external_pdf_url',
         'external_pdf_url_en',
         'external_pdf_url_ur',
+        'pdf_source',
+        'drive_file_id',
         'is_latest',
         'is_featured',
         'is_active',
@@ -160,7 +163,7 @@ class Book extends Model
     public function localizedPdfSource(?string $locale = null): ?array
     {
         foreach ($this->localizedPdfCandidates($locale) as [$path, $externalUrl]) {
-            if (filled($path)) {
+            if (filled($path) && Storage::disk('public')->exists($path)) {
                 return ['type' => 'local', 'value' => $path];
             }
 
@@ -186,7 +189,7 @@ class Book extends Model
 
     private function resolvePdfUrl(?string $path, ?string $externalUrl): ?string
     {
-        if (filled($path)) {
+        if (filled($path) && Storage::disk('public')->exists($path)) {
             return Storage::disk('public')->url($path);
         }
 
@@ -199,7 +202,7 @@ class Book extends Model
             return null;
         }
 
-        return filter_var($externalUrl, FILTER_VALIDATE_URL) ? $externalUrl : null;
+        return GoogleDrivePdf::isSupportedPdfUrl($externalUrl) ? $externalUrl : null;
     }
 
     private function localizedPdfCandidates(?string $locale = null): array

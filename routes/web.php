@@ -26,6 +26,7 @@ Route::get('/language/{locale}', [LanguageController::class, 'switch'])->name('l
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
 Route::get('/books/{book:slug}', [BookController::class, 'show'])->name('books.show');
 Route::get('/books/{book:slug}/read', [BookController::class, 'reader'])->name('books.reader');
+Route::get('/books/{book:slug}/pdf', [BookController::class, 'pdf'])->name('books.pdf');
 Route::get('/books/{book:slug}/download', [BookController::class, 'download'])->name('books.download');
 Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
 Route::get('/events/{event:slug}', [IslamicEventController::class, 'show'])->name('events.show');
