@@ -20,20 +20,22 @@
     <a href="#main-content" class="skip-link">{{ __('messages.nav.home') }}</a>
     <div class="site-shell">
         <header class="site-header">
-            <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-                <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-3" aria-label="{{ $site['madrasa_name'] ?? __('messages.meta.site_name') }}">
-                    @if(! empty($site['logo']))
-                        <img src="{{ Storage::disk('public')->url($site['logo']) }}" alt="{{ $site['madrasa_name'] ?? __('messages.meta.site_name') }}" class="brand-mark object-cover p-0">
-                    @else
-                        <span class="brand-mark">{{ __('messages.meta.logo_letter') }}</span>
-                    @endif
-                    <span class="min-w-0">
-                        <span class="block max-w-56 truncate text-base font-extrabold leading-tight text-white sm:text-lg">{{ $site['madrasa_name'] ?? __('messages.meta.site_name') }}</span>
-                        <span class="mt-0.5 block text-xs text-white/80">{{ __('messages.jamia.brand_tagline') }}</span>
-                    </span>
-                </a>
-                <div class="flex items-center gap-2 md:hidden">
+            <div class="reference-header mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+                <div class="reference-header__identity">
                     @include('partials.language-switcher')
+                    <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-3" aria-label="{{ $site['madrasa_name'] ?? __('messages.meta.site_name') }}">
+                        @if(! empty($site['logo']))
+                            <img src="{{ Storage::disk('public')->url($site['logo']) }}" alt="{{ $site['madrasa_name'] ?? __('messages.meta.site_name') }}" class="brand-mark object-cover p-0">
+                        @else
+                            <span class="brand-mark" aria-hidden="true">🕌</span>
+                        @endif
+                        <span class="min-w-0">
+                            <span class="block max-w-56 truncate text-base font-extrabold leading-tight text-white sm:text-lg">{{ $site['madrasa_name'] ?? __('messages.meta.site_name') }}</span>
+                            <span class="mt-0.5 block text-xs text-white/80">{{ __('messages.jamia.brand_tagline') }}</span>
+                        </span>
+                    </a>
+                </div>
+                <div class="sm:hidden">
                     <button type="button" id="mobile-menu-button" class="mobile-menu-toggle" aria-controls="main-nav" aria-expanded="false">
                         <span class="grid gap-1" aria-hidden="true">
                             <span class="block h-0.5 w-4 rounded bg-white"></span>
@@ -43,8 +45,8 @@
                         <span>{{ __('messages.nav.menu') }}</span>
                     </button>
                 </div>
-                <nav id="main-nav" class="hidden absolute left-0 right-0 top-full border-b border-white/15 px-4 py-4 shadow-xl shadow-black/15 md:static md:flex md:border-0 md:bg-transparent md:p-0 md:shadow-none" aria-label="{{ __('messages.nav.menu') }}">
-                    <div class="flex flex-col gap-2 md:flex-row md:items-center md:gap-1">
+                <nav id="main-nav" class="hidden absolute left-0 right-0 top-full border-b border-white/15 px-4 py-4 shadow-xl shadow-black/15 sm:static sm:flex sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none" aria-label="{{ __('messages.nav.menu') }}">
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-1">
                         <a class="nav-link" href="{{ route('home') }}">{{ __('messages.nav.home') }}</a>
                         <a class="nav-link" href="{{ route('books.index') }}">{{ __('messages.nav.books') }}</a>
                         <a class="nav-link" href="{{ route('lectures.index') }}">{{ __('messages.nav.lectures') }}</a>
@@ -61,16 +63,20 @@
                                 <button class="nav-link text-start" type="submit">{{ __('messages.nav.logout') }}</button>
                             </form>
                         @else
-                            <a class="nav-link" href="{{ route('login') }}">{{ __('messages.nav.login') }}</a>
-                            <a class="btn btn-primary btn-sm" href="{{ route('register') }}">{{ __('messages.nav.register') }}</a>
+                            <a class="nav-admin-link" href="{{ route('login') }}">🔐 {{ __('messages.nav.admin') }}</a>
                         @endauth
-                        <div class="hidden md:block">
-                            @include('partials.language-switcher')
-                        </div>
                     </div>
                 </nav>
             </div>
         </header>
+
+        @php($latestAudio = \App\Models\Audio::active()->latest()->first())
+        @if($latestAudio)
+            <a href="{{ route('audios.index') }}" class="latest-audio-banner">
+                <span class="live-nav-dot" aria-hidden="true"></span>
+                {{ __('messages.jamia.latest_audio_banner', ['title' => $latestAudio->localized_title]) }}
+            </a>
+        @endif
 
         <main id="main-content" class="flex-1">
             @include('partials.flash')
@@ -147,7 +153,7 @@
         });
 
         mainNav.on('click', 'a, button', function () {
-            if (window.matchMedia('(max-width: 767px)').matches) {
+            if (window.matchMedia('(max-width: 639px)').matches) {
                 mainNav.addClass('hidden');
                 mobileMenuButton.attr('aria-expanded', 'false');
             }

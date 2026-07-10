@@ -1,5 +1,5 @@
 @php($currentLocale = app()->getLocale())
-<div class="language-switcher" aria-label="{{ __('messages.language.label') }}">
+<select class="language-switcher" aria-label="{{ __('messages.language.label') }}" onchange="window.location.assign(this.value)">
     @foreach(config('app.supported_locales', ['en' => 'English']) as $locale => $label)
         @php($labelText = match ($locale) {
             'en' => __('messages.language.english'),
@@ -7,13 +7,6 @@
             'ar' => \Illuminate\Support\Facades\Lang::has('messages.language.arabic') ? __('messages.language.arabic') : 'Arabic',
             default => $label,
         })
-        <a
-            href="{{ route('language.switch', $locale) }}"
-            hreflang="{{ $locale }}"
-            aria-current="{{ $currentLocale === $locale ? 'true' : 'false' }}"
-            class="language-switcher-link"
-        >
-            {{ $labelText }}
-        </a>
+        <option value="{{ route('language.switch', $locale) }}" @selected($currentLocale === $locale)>{{ '🌐 '.$labelText }}</option>
     @endforeach
-</div>
+</select>

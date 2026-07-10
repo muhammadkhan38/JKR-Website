@@ -108,6 +108,7 @@ return [
         'upcoming_lectures' => '🗓️ آنے والے لیکچرز',
         'full_schedule' => 'مکمل شیڈول ←',
         'latest_announcements' => '📢 تازہ اعلانات',
+        'latest_audio_banner' => 'تازہ آڈیو — :title · سننے کے لیے دبائیں',
         'all_announcements' => 'تمام اعلانات ←',
         'lectures_title' => '🗓️ لیکچر شیڈول',
         'lectures_copy' => 'بیانات، ہفتہ وار دروس اور ہمارے اساتذہ کے دوسرے شہروں کے دورے۔',

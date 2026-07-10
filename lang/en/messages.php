@@ -108,6 +108,7 @@ return [
         'upcoming_lectures' => '🗓️ Upcoming Lectures',
         'full_schedule' => 'Full schedule →',
         'latest_announcements' => '📢 Latest Announcements',
+        'latest_audio_banner' => 'LATEST AUDIO — :title · Tap to listen',
         'all_announcements' => 'All announcements →',
         'lectures_title' => '🗓️ Lecture Schedule',
         'lectures_copy' => 'Bayans, weekly dars, and our teachers’ visits to other cities.',
