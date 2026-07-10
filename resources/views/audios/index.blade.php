@@ -3,11 +3,14 @@
 @section('title', __('messages.audios.title'))
 
 @section('content')
-<section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-    <div class="mb-7">
-        <p class="section-kicker">{{ __('messages.audios.kicker') }}</p>
-        <h1 class="section-heading">{{ __('messages.audios.title') }}</h1>
+<section class="page-hero">
+    <div class="page-hero__content mx-auto max-w-7xl px-4 py-14 text-center sm:px-6 lg:px-8">
+        <p class="text-sm font-bold uppercase tracking-[0.14em] text-[var(--mint-300)]">{{ __('messages.audios.kicker') }}</p>
+        <h1 class="mt-3 font-serif text-4xl font-bold sm:text-5xl">{{ __('messages.audios.title') }}</h1>
     </div>
+</section>
+
+<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
     <form method="GET" class="search-panel mb-8 sm:flex sm:items-center sm:gap-3">
         <label for="audio-search" class="sr-only">{{ __('messages.audios.search_placeholder') }}</label>
         <input id="audio-search" type="search" name="q" value="{{ request('q') }}" placeholder="{{ __('messages.audios.search_placeholder') }}" class="form-input flex-1">

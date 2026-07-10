@@ -3,13 +3,16 @@
 @section('title', __('messages.books.all_title'))
 
 @section('content')
-<section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-    <div class="mb-7 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-            <p class="section-kicker">{{ __('messages.books.library') }}</p>
-            <h1 class="section-heading">{{ __('messages.books.all_title') }}</h1>
-            <p class="section-copy">{{ __('messages.home.default_intro') }}</p>
-        </div>
+<section class="page-hero">
+    <div class="page-hero__content mx-auto max-w-7xl px-4 py-14 text-center sm:px-6 lg:px-8">
+        <p class="text-sm font-bold uppercase tracking-[0.14em] text-[var(--mint-300)]">{{ __('messages.books.library') }}</p>
+        <h1 class="mt-3 font-serif text-4xl font-bold sm:text-5xl">{{ __('messages.books.all_title') }}</h1>
+        <p class="mx-auto mt-4 max-w-2xl text-base leading-8 text-white/90">{{ __('messages.home.default_intro') }}</p>
+    </div>
+</section>
+
+<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="mb-7 flex justify-end">
         <a href="{{ route('books.index') }}" class="btn btn-secondary btn-sm">{{ __('messages.common.view_all') }}</a>
     </div>
 

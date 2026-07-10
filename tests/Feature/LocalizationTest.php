@@ -117,6 +117,10 @@ test('main website view routes render in english and urdu', function () {
         route('events.show', $event, false),
         route('audios.index', [], false),
         route('contact', [], false),
+        route('lectures.index', [], false),
+        route('live.index', [], false),
+        route('institute.index', [], false),
+        route('announcements.index', [], false),
         route('login', [], false),
         route('register', [], false),
     ];

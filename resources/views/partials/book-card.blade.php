@@ -16,7 +16,7 @@
             @if($book->is_latest)<span class="badge badge-green">{{ __('messages.common.latest') }}</span>@endif
             @if($book->localized_language)<span class="badge badge-muted">{{ $book->localized_language }}</span>@endif
         </div>
-        <h3 class="text-xl font-extrabold leading-snug text-emerald-950">
+        <h3 class="font-serif text-xl font-bold leading-snug text-[var(--forest-900)]">
             <a href="{{ route('books.show', $book) }}">{{ $book->localized_title }}</a>
         </h3>
         <p class="mt-2 text-sm font-semibold leading-6 text-stone-600">{{ collect([$book->author?->localized_name, $book->category?->localized_name])->filter()->implode(__('messages.common.separator')) }}</p>
@@ -26,7 +26,7 @@
         <div class="mt-auto flex flex-wrap gap-2 pt-6">
             <a href="{{ route('books.reader', $book) }}" class="btn btn-primary btn-sm">{{ __('messages.common.read_online') }}</a>
             @if($book->download_allowed && $book->localized_pdf_url)
-                <a href="{{ route('books.download', $book) }}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">{{ __('messages.common.download_pdf') }}</a>
+                <a href="{{ route('books.download', $book) }}" target="_blank" rel="noopener" class="btn btn-gold btn-sm">{{ __('messages.common.download_pdf') }}</a>
             @endif
             <a href="{{ route('books.show', $book) }}" class="btn btn-muted btn-sm">{{ __('messages.common.details') }}</a>
             @auth

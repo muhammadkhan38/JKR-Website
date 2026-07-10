@@ -15,6 +15,7 @@ use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InstituteController;
 use App\Http\Controllers\IslamicEventController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\ProfileController;
@@ -32,6 +33,10 @@ Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->
 Route::get('/events/{event:slug}', [IslamicEventController::class, 'show'])->name('events.show');
 Route::get('/audios', [AudioController::class, 'index'])->name('audios.index');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::get('/lectures', [InstituteController::class, 'lectures'])->name('lectures.index');
+Route::get('/live-bayan', [InstituteController::class, 'live'])->name('live.index');
+Route::get('/institute', [InstituteController::class, 'institute'])->name('institute.index');
+Route::get('/announcements', [InstituteController::class, 'announcements'])->name('announcements.index');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.store');

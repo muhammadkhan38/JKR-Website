@@ -3,12 +3,15 @@
 @section('title', __('messages.contact_page.title'))
 
 @section('content')
-<section class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-    <div class="mb-8 max-w-3xl">
-        <p class="section-kicker">{{ __('messages.contact_page.title') }}</p>
-        <h1 class="section-heading">{{ __('messages.contact_page.heading') }}</h1>
-        <p class="section-copy">{{ __('messages.contact_page.requests_text') }}</p>
+<section class="page-hero">
+    <div class="page-hero__content mx-auto max-w-6xl px-4 py-14 text-center sm:px-6 lg:px-8">
+        <p class="text-sm font-bold uppercase tracking-[0.14em] text-[var(--mint-300)]">{{ __('messages.contact_page.title') }}</p>
+        <h1 class="mt-3 font-serif text-4xl font-bold sm:text-5xl">{{ __('messages.contact_page.heading') }}</h1>
+        <p class="mx-auto mt-4 max-w-3xl leading-8 text-white/90">{{ __('messages.contact_page.requests_text') }}</p>
     </div>
+</section>
+
+<section class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
     <div class="grid gap-6 md:grid-cols-[1fr_0.9fr]">
         <div class="surface-card p-6 sm:p-8">
             <h2 class="text-2xl font-extrabold text-emerald-950">{{ $settings['madrasa_name'] ?? __('messages.meta.site_name') }}</h2>

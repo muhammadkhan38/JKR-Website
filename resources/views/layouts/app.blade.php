@@ -27,27 +27,30 @@
                     @else
                         <span class="brand-mark">{{ __('messages.meta.logo_letter') }}</span>
                     @endif
-                    <span class="max-w-56 truncate text-base font-extrabold leading-tight text-emerald-950 sm:text-lg">{{ $site['madrasa_name'] ?? __('messages.meta.site_name') }}</span>
+                    <span class="min-w-0">
+                        <span class="block max-w-56 truncate text-base font-extrabold leading-tight text-white sm:text-lg">{{ $site['madrasa_name'] ?? __('messages.meta.site_name') }}</span>
+                        <span class="mt-0.5 block text-xs text-white/80">{{ __('messages.jamia.brand_tagline') }}</span>
+                    </span>
                 </a>
                 <div class="flex items-center gap-2 md:hidden">
                     @include('partials.language-switcher')
                     <button type="button" id="mobile-menu-button" class="mobile-menu-toggle" aria-controls="main-nav" aria-expanded="false">
                         <span class="grid gap-1" aria-hidden="true">
-                            <span class="block h-0.5 w-4 rounded bg-emerald-950"></span>
-                            <span class="block h-0.5 w-4 rounded bg-emerald-950"></span>
-                            <span class="block h-0.5 w-4 rounded bg-emerald-950"></span>
+                            <span class="block h-0.5 w-4 rounded bg-white"></span>
+                            <span class="block h-0.5 w-4 rounded bg-white"></span>
+                            <span class="block h-0.5 w-4 rounded bg-white"></span>
                         </span>
                         <span>{{ __('messages.nav.menu') }}</span>
                     </button>
                 </div>
-                <nav id="main-nav" class="hidden absolute left-0 right-0 top-full border-b border-emerald-100 bg-white/95 px-4 py-4 shadow-xl shadow-emerald-950/10 md:static md:flex md:border-0 md:bg-transparent md:p-0 md:shadow-none" aria-label="{{ __('messages.nav.menu') }}">
+                <nav id="main-nav" class="hidden absolute left-0 right-0 top-full border-b border-white/15 px-4 py-4 shadow-xl shadow-black/15 md:static md:flex md:border-0 md:bg-transparent md:p-0 md:shadow-none" aria-label="{{ __('messages.nav.menu') }}">
                     <div class="flex flex-col gap-2 md:flex-row md:items-center md:gap-1">
                         <a class="nav-link" href="{{ route('home') }}">{{ __('messages.nav.home') }}</a>
                         <a class="nav-link" href="{{ route('books.index') }}">{{ __('messages.nav.books') }}</a>
-                        <a class="nav-link" href="{{ route('home') }}#categories">{{ __('messages.nav.categories') }}</a>
-                        <a class="nav-link" href="{{ route('home') }}#about">{{ __('messages.nav.about') }}</a>
-                        <a class="nav-link" href="{{ route('audios.index') }}">{{ __('messages.nav.audios') }}</a>
-                        <a class="nav-link" href="{{ route('contact') }}">{{ __('messages.nav.contact') }}</a>
+                        <a class="nav-link" href="{{ route('lectures.index') }}">{{ __('messages.nav.lectures') }}</a>
+                        <a class="nav-link" href="{{ route('live.index') }}"><span class="live-nav-dot" aria-hidden="true"></span>{{ __('messages.nav.live') }}</a>
+                        <a class="nav-link" href="{{ route('institute.index') }}">{{ __('messages.nav.institute') }}</a>
+                        <a class="nav-link" href="{{ route('announcements.index') }}">{{ __('messages.nav.announcements') }}</a>
                         @auth
                             <a class="nav-link" href="{{ route('bookmarks.index') }}">{{ __('messages.nav.bookmarks') }}</a>
                             @if(auth()->user()->isAdmin())
@@ -85,7 +88,7 @@
                         @endif
                         <h2 class="text-lg font-extrabold">{{ $site['madrasa_name'] ?? __('messages.meta.site_name') }}</h2>
                     </div>
-                    <p class="mt-4 max-w-xl text-sm leading-8 text-emerald-50/85">{{ $site['short_about'] ?? __('messages.footer.default_about') }}</p>
+                    <p class="mt-4 max-w-xl text-sm leading-8 text-emerald-50/85">{{ __('messages.jamia.footer_summary') }}</p>
                     @if(! empty($site['facebook_link']) || ! empty($site['youtube_link']))
                         <div class="mt-5 flex flex-wrap gap-3 text-sm font-bold">
                             @if(! empty($site['facebook_link']))
@@ -98,23 +101,25 @@
                     @endif
                 </div>
                 <div>
+                    <h3 class="font-extrabold text-amber-200">{{ __('messages.footer.quick_links') }}</h3>
+                    <div class="mt-4 flex flex-col gap-2 text-sm font-semibold">
+                        <a class="footer-link" href="{{ route('books.index') }}">{{ __('messages.nav.books') }}</a>
+                        <a class="footer-link" href="{{ route('lectures.index') }}">{{ __('messages.jamia.lecture_schedule') }}</a>
+                        <a class="footer-link" href="{{ route('live.index') }}">{{ __('messages.jamia.live_title') }}</a>
+                        <a class="footer-link" href="{{ route('institute.index') }}">{{ __('messages.jamia.institute_title') }}</a>
+                        @auth
+                            <a class="footer-link" href="{{ route('bookmarks.index') }}">{{ __('messages.nav.bookmarks') }}</a>
+                        @endauth
+                    </div>
+                </div>
+                <div>
                     <h3 class="font-extrabold text-amber-200">{{ __('messages.footer.contact') }}</h3>
                     <div class="mt-4 space-y-2 text-sm leading-7 text-emerald-50/85">
                         @if(! empty($site['contact_number'])) <p>{{ $site['contact_number'] }}</p> @endif
                         @if(! empty($site['email'])) <p>{{ $site['email'] }}</p> @endif
                         @if(! empty($site['address'])) <p>{{ $site['address'] }}</p> @endif
                     </div>
-                </div>
-                <div>
-                    <h3 class="font-extrabold text-amber-200">{{ __('messages.footer.quick_links') }}</h3>
-                    <div class="mt-4 flex flex-col gap-2 text-sm font-semibold">
-                        <a class="footer-link" href="{{ route('books.index') }}">{{ __('messages.footer.all_books') }}</a>
-                        <a class="footer-link" href="{{ route('audios.index') }}">{{ __('messages.footer.audio_lessons') }}</a>
-                        <a class="footer-link" href="{{ route('contact') }}">{{ __('messages.footer.contact_madrasa') }}</a>
-                        @auth
-                            <a class="footer-link" href="{{ route('bookmarks.index') }}">{{ __('messages.nav.bookmarks') }}</a>
-                        @endauth
-                    </div>
+                    <a class="footer-link mt-5 inline-flex text-sm font-semibold" href="{{ route('contact') }}">{{ __('messages.footer.contact_madrasa') }}</a>
                 </div>
             </div>
             <div class="border-t border-white/10 px-4 py-5 text-center text-sm text-emerald-50/80">
