@@ -53,15 +53,15 @@
         <div>
             <h2 class="section-heading">{{ __('messages.jamia.upcoming_lectures') }}</h2>
             <div class="mt-8 grid gap-4">
-                @foreach($homeLectures as $lecture)
+                @foreach($audios as $lecture)
                     <article class="information-card flex items-center gap-4">
-                        <div class="date-tile date-tile--soft" aria-label="{{ $lecture['day'] }} {{ $lecture['month'] }}">
-                            <span class="date-tile__day">{{ $lecture['day'] }}</span>
-                            <span class="date-tile__month">{{ $lecture['month'] }}</span>
+                        <div class="date-tile date-tile--soft" aria-label="{{ $lecture->created_at?->format('d M Y') }}">
+                            <span class="date-tile__day">{{ $lecture->created_at?->format('d') }}</span>
+                            <span class="date-tile__month">{{ $lecture->created_at?->format('M') }}</span>
                         </div>
                         <div class="min-w-0 flex-1">
-                            <h3 class="font-serif text-lg font-bold text-[var(--forest-900)]">{{ $lecture['topic'] }}</h3>
-                            <p class="mt-1 text-sm leading-6 text-stone-500">{{ $lecture['speaker'] }} · {{ $lecture['city'] }} · {{ $lecture['time'] }}</p>
+                            <h3 class="font-serif text-lg font-bold text-[var(--forest-900)]">{{ $lecture->localized_title }}</h3>
+                            <p class="mt-1 text-sm leading-6 text-stone-500">{{ $lecture->localized_speaker ?: __('messages.audios.default_speaker') }} @if($lecture->duration) · {{ $lecture->duration }} @endif</p>
                         </div>
                     </article>
                 @endforeach
@@ -71,14 +71,14 @@
         <div>
             <h2 class="section-heading">{{ __('messages.jamia.latest_announcements') }}</h2>
             <div class="mt-8 grid gap-4">
-                @foreach($homeAnnouncements as $announcement)
+                @foreach($events as $announcement)
                     <article class="information-card">
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="announcement-card__tag">{{ $announcement['type'] }}</span>
-                            <span class="announcement-card__date">{{ $announcement['date'] }}</span>
+                            <span class="announcement-card__tag">{{ __('messages.admin.events.collection') }}</span>
+                            <span class="announcement-card__date">{{ $announcement->start_date?->format('d M Y') ?? $announcement->created_at?->format('d M Y') }}</span>
                         </div>
-                        <h3 class="mt-3 font-serif text-lg font-bold text-[var(--forest-900)]">{{ $announcement['title'] }}</h3>
-                        <p class="mt-2 line-clamp-3 text-sm leading-6 text-stone-600">{{ $announcement['body'] }}</p>
+                        <h3 class="mt-3 font-serif text-lg font-bold text-[var(--forest-900)]">{{ $announcement->localized_title }}</h3>
+                        <p class="mt-2 line-clamp-3 text-sm leading-6 text-stone-600">{{ $announcement->localized_description }}</p>
                     </article>
                 @endforeach
             </div>

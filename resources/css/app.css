@@ -1070,6 +1070,7 @@ html[lang='ar'] .book-card h3 {
 .course-card,
 .teacher-card,
 .announcement-card {
+    display: block;
     border-radius: 14px;
     background: #fff;
     box-shadow: var(--shadow-card);

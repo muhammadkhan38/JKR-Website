@@ -24,7 +24,9 @@
             <p class="mt-3 line-clamp-3 text-sm leading-7 text-stone-700">{{ $summary }}</p>
         @endif
         <div class="mt-auto flex flex-wrap gap-2 pt-6">
-            <a href="{{ route('books.reader', $book) }}" class="btn btn-primary btn-sm">{{ __('messages.common.read_online') }}</a>
+            @if($book->localized_pdf_url)
+                <a href="{{ route('books.reader', $book) }}" class="btn btn-primary btn-sm">{{ __('messages.common.read_online') }}</a>
+            @endif
             @if($book->download_allowed && $book->localized_pdf_url)
                 <a href="{{ route('books.download', $book) }}" target="_blank" rel="noopener" class="btn btn-gold btn-sm">{{ __('messages.common.download_pdf') }}</a>
             @endif

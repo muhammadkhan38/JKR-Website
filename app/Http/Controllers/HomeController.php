@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\InstituteContent;
 use App\Models\Audio;
 use App\Models\Book;
 use App\Models\Category;
@@ -13,7 +12,7 @@ use Illuminate\View\View;
 
 class HomeController extends Controller
 {
-    public function index(InstituteContent $instituteContent): View
+    public function index(): View
     {
         return view('home', [
             'settings' => Setting::localizedPairs(),
@@ -23,8 +22,6 @@ class HomeController extends Controller
             'events' => IslamicEvent::visible()->with(['books' => fn ($query) => $query->active()->with(['author', 'category'])->take(4)])->orderBy('display_order')->take(4)->get(),
             'categories' => Category::active()->withCount(['books' => fn ($query) => $query->active()])->orderByRaw(LocalizedColumns::orderExpression('name'))->take(8)->get(),
             'audios' => Audio::active()->with(['book', 'category'])->latest()->take(4)->get(),
-            'homeLectures' => $instituteContent->homeLectures(),
-            'homeAnnouncements' => $instituteContent->homeAnnouncements(),
         ]);
     }
 }

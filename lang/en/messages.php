@@ -118,6 +118,8 @@ return [
         'open_to_all' => 'Open to all',
         'live_title' => '🎙️ Live Bayan',
         'live_copy' => 'Listen to lectures live from the Jamia, wherever you are in the world.',
+        'live_unavailable' => 'No live transmission right now',
+        'live_unavailable_copy' => 'The next live bayan will be announced here. Meanwhile, browse the recordings below.',
         'on_air' => 'ON AIR',
         'toggle_live_animation' => 'Toggle live player animation',
         'start_live_animation' => 'Start live player animation',

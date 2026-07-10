@@ -12,30 +12,32 @@
 
 <section class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
     <div class="live-player">
-        <div class="live-player__status"><span class="live-dot" aria-hidden="true"></span> {{ __('messages.jamia.on_air') }}</div>
-        <div class="live-player__body">
-            <button type="button" class="live-play-button" data-live-toggle aria-pressed="false" data-start-label="{{ __('messages.jamia.start_live_animation') }}" data-pause-label="{{ __('messages.jamia.pause_live_animation') }}" aria-label="{{ __('messages.jamia.toggle_live_animation') }}"><span data-live-icon aria-hidden="true">▶</span></button>
-            <div class="min-w-0 flex-1">
-                <h2 class="live-player__title">{{ $live['title'] }}</h2>
-                <p class="live-player__meta">{{ $live['speaker'] }} · {{ __('messages.jamia.started', ['time' => $live['started']]) }} · {{ $live['listeners'] }}</p>
-            </div>
-            <div class="equalizer" data-equalizer aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="live-off-air">
+            <div class="live-off-air__icon" aria-hidden="true">🌙</div>
+            <h2>{{ __('messages.jamia.live_unavailable') }}</h2>
+            <p>{{ __('messages.jamia.live_unavailable_copy') }}</p>
         </div>
     </div>
 
     <div class="mt-12">
         <h2 class="section-heading">{{ __('messages.jamia.past_recordings') }}</h2>
         <div class="mt-8 grid gap-4">
-            @foreach($recordings as $recording)
+            @forelse($recordings as $recording)
                 <article class="recording-card">
-                    <a href="{{ route('audios.index') }}" class="recording-card__button" aria-label="{{ __('messages.jamia.browse_audio_label') }}"><span aria-hidden="true">▶</span></a>
+                    @if($recording->book?->localized_pdf_url)
+                        <a href="{{ route('books.reader', $recording->book) }}" class="recording-card__button" aria-label="{{ $recording->book->localized_title }}"><span aria-hidden="true">📖</span></a>
+                    @endif
                     <div class="recording-card__content">
-                        <h3 class="recording-card__title">{{ $recording['title'] }}</h3>
-                        <p class="recording-card__detail">{{ $recording['speaker'] }} · {{ $recording['date'] }} · {{ $recording['duration'] }}</p>
+                        <h3 class="recording-card__title">{{ $recording->localized_title }}</h3>
+                        <p class="recording-card__detail">{{ $recording->localized_speaker ?: __('messages.audios.default_speaker') }} @if($recording->duration) · {{ $recording->duration }} @endif</p>
+                        @if($recording->audio_url)
+                            <audio controls class="mt-3 w-full"><source src="{{ $recording->audio_url }}"></audio>
+                        @endif
                     </div>
-                    <span class="schedule-city">{{ $recording['duration'] }}</span>
                 </article>
-            @endforeach
+            @empty
+                <p class="surface-card p-6 text-stone-600">{{ __('messages.audios.empty') }}</p>
+            @endforelse
         </div>
         <a href="{{ route('audios.index') }}" class="btn btn-secondary mt-7">{{ __('messages.jamia.browse_audio') }}</a>
     </div>

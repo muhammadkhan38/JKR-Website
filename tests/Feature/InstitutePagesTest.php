@@ -8,12 +8,12 @@ beforeEach(function (): void {
     $this->seed();
 });
 
-test('the institute reference pages render their complete content', function (): void {
+test('the institute pages render database-backed content', function (): void {
     $pages = [
-        'lectures.index' => 'Tafsir of Surah Al-Kahf',
-        'live.index' => 'The Importance of Seeking Knowledge',
-        'institute.index' => 'Dars-e-Nizami (Alim Course)',
-        'announcements.index' => 'Admissions Open for 2026–27',
+        'lectures.index' => 'Preparing for Ramadan',
+        'live.index' => 'Preparing for Ramadan',
+        'institute.index' => 'Madrasa Scholars',
+        'announcements.index' => 'Ramadan Collection',
     ];
 
     foreach ($pages as $route => $content) {
